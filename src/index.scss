@@ -1,0 +1,47 @@
+/* ####################################### */
+/*      VARIABLES                          */
+/* ####################################### */
+
+$background: rgb(255, 255, 255);
+$text: rgb(36, 36, 36);
+$font-size: 18px;
+
+/* ####################################### */
+/*      MAIN ELEMENTS                      */
+/* ####################################### */
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    width: 100%;
+    height: 100%;
+    font-size: $font-size;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    background: $background;
+
+    font-family: "Nunito Sans", "Nunito", "Open Sans", "Noto Sans SC", "Cairo", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    color: $text;
+    overflow: hidden;
+    user-select: none;
+}
+
+input,
+button {
+    color: inherit;
+    font: inherit;
+}
+
+#root {
+    width: 100%;
+    height: 100%;
+}
