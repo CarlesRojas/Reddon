@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { CookiesProvider } from "react-cookie";
 
 import App from "./App";
 import EventsPubSub from "./EventsPubSub";
@@ -11,7 +12,9 @@ window.PubSub = new EventsPubSub();
 
 ReactDOM.render(
     <React.StrictMode>
-        <App />
+        <CookiesProvider>
+            <App />
+        </CookiesProvider>
     </React.StrictMode>,
     document.getElementById("root")
 );
