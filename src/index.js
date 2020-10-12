@@ -1,9 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { CookiesProvider } from "react-cookie";
 
 import App from "./App";
 import EventsPubSub from "./EventsPubSub";
+import UtilsProvider from "contexts/Utils";
+import APIProvider from "contexts/API";
 
 import "./index.scss";
 
@@ -11,10 +12,10 @@ import "./index.scss";
 window.PubSub = new EventsPubSub();
 
 ReactDOM.render(
-    <React.StrictMode>
-        <CookiesProvider>
+    <UtilsProvider>
+        <APIProvider>
             <App />
-        </CookiesProvider>
-    </React.StrictMode>,
+        </APIProvider>
+    </UtilsProvider>,
     document.getElementById("root")
 );

@@ -8,7 +8,6 @@
         "qs": "^6.9.4",
         "randomstring": "^1.1.5",
         "react": "^16.13.1",
-        "react-cookie": "^4.0.3",
         "react-dom": "^16.13.1",
         "react-inlinesvg": "^2.1.0",
         "react-router-dom": "^5.2.0",

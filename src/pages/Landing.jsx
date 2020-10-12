@@ -1,43 +1,63 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import randomstring from "randomstring";
 import { Redirect } from "react-router-dom";
-import { useCookies } from "react-cookie";
 import qs from "qs";
 
-export default function Landing(props) {
-    // Is the app running in debug mode
-    const debug = true;
+// Contexts
+import { API } from "contexts/API";
+import { Utils } from "contexts/Utils";
 
-    // Use cookies
-    const [cookies, setCookie, removeCookie] = useCookies();
+export default function Landing(props) {
+    // Contexts
+    const { getAccessToken } = useContext(API);
+    const { setCookie, getCookies, clearCookies, deleteCookie } = useContext(Utils);
+
+    // State
+    const [accessGranted, setAccessGranted] = useState(false);
+    const [cookies] = useState(getCookies());
 
     // Get the url parameters
     const urlParams = qs.parse(props.location.search, { ignoreQueryPrefix: true });
 
+    // Access is Granted -> Go to Home
+    if (accessGranted) {
+        // Reddirect to Home
+        var render = <Redirect to="/home" />;
+    }
+
+    // Error in url params -> Restart
+    else if (urlParams.error) {
+        console.log("Login Error -> Start Again");
+
+        // Remove all cookies and start again
+        clearCookies();
+
+        // Reddirect to Start with error log
+        var render = <Redirect to="/?loginError=true" />;
+    }
+
     // Refresh Token Present -> Get a new Access Token and go to Home
-    if (cookies.refresh_token) {
+    else if (cookies.refresh_token) {
         // There is an Access Token
         if (cookies.access_token) {
             console.log("Refresh and Aceess Tokens Present -> Remember Me");
-            var render = null;
+            render = null;
         } else {
             console.log("Refresh Token Present -> Get Access Token");
             render = null;
         }
     }
 
-    // No Refresh Token -> Login Process
+    // No Refresh Token -> Log in Process
     else {
         // State String Present -> Fetch Access and Refresh Tokens and go Home
-        if (cookies.reddon_state) {
+        if (cookies.reddon_state && urlParams.state) {
             // Correct State Random String -> Fetch Access and Refresh Tokens
             if (urlParams.state && cookies.reddon_state === urlParams.state) {
-                console.log("Log In Done -> Fetch Access and Refresh Tokens");
+                console.log("Login Done -> Fetch Access and Refresh Tokens");
 
-                // Delete state random string
-                removeCookie("reddon_state");
-
-                // CARLES -> Continue Here
+                // Get the access and refresh tokens for the first time
+                setAccessGranted(getAccessToken(urlParams.code, process.env.REACT_APP_REDIRECT_URI));
 
                 render = null;
             }
@@ -47,17 +67,19 @@ export default function Landing(props) {
                 console.log("Incorrect State String -> Start Again");
 
                 // Remove all cookies and start again
-                Object.keys(cookies).map((cookie) => removeCookie(cookie));
-                render = <Redirect to="/" />;
+                clearCookies();
+
+                // Reddirect to Start with error log
+                var render = <Redirect to="/?loginError=true" />;
             }
         }
 
-        // No State String -> Login with Reddit
+        // No State String -> Log in with Reddit
         else {
-            console.log("First Time -> Log In with Reddit");
+            console.log("First Time -> Log in with Reddit");
 
             // Create Oauth request link
-            const REDIRECT_URI = debug ? "http://localhost:3000" : process.env.REACT_APP_REDIRECT_URI;
+            const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
             const REACT_APP_CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
             const RANDOM_STRING = randomstring.generate(50);
             const link = `https://www.reddit.com/api/v1/authorize.compact?client_id=${REACT_APP_CLIENT_ID}&response_type=code&state=${RANDOM_STRING}&redirect_uri=${REDIRECT_URI}&duration=permanent&scope=vote`;
@@ -65,10 +87,16 @@ export default function Landing(props) {
             // Save state random string
             setCookie("reddon_state", RANDOM_STRING);
 
+            console.log(urlParams);
+
+            // Render Landing Page
             render = (
-                <a href={link} className="link">
-                    Reddit Logg In
-                </a>
+                <div>
+                    {urlParams.loginError ? <p>Login Error</p> : null}
+                    <a href={link} className="link">
+                        Log in with Reddit
+                    </a>
+                </div>
             );
         }
     }
