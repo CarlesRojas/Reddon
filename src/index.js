@@ -5,6 +5,7 @@ import App from "./App";
 import EventsPubSub from "./EventsPubSub";
 import UtilsProvider from "contexts/Utils";
 import APIProvider from "contexts/API";
+import "fonts/VAGRoundedStd-Light.ttf";
 
 import "./index.scss";
 

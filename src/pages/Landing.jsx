@@ -2,15 +2,19 @@ import React, { useState, useContext } from "react";
 import randomstring from "randomstring";
 import { Redirect } from "react-router-dom";
 import qs from "qs";
+import SVG from "react-inlinesvg";
 
 // Contexts
 import { API } from "contexts/API";
 import { Utils } from "contexts/Utils";
 
+// Logo
+import Logo from "resources/ReddonLogo.svg";
+
 export default function Landing(props) {
     // Contexts
-    const { getAccessToken } = useContext(API);
-    const { setCookie, getCookies, clearCookies, deleteCookie } = useContext(Utils);
+    const { requestAccessToken, refreshAccessToken } = useContext(API);
+    const { setCookie, getCookies, clearCookies } = useContext(Utils);
 
     // State
     const [accessGranted, setAccessGranted] = useState(false);
@@ -18,6 +22,10 @@ export default function Landing(props) {
 
     // Get the url parameters
     const urlParams = qs.parse(props.location.search, { ignoreQueryPrefix: true });
+
+    // Set dark mode
+    //document.body.classList.remove("dark");
+    //document.body.classList.add("dark");
 
     // Access is Granted -> Go to Home
     if (accessGranted) {
@@ -33,19 +41,17 @@ export default function Landing(props) {
         clearCookies();
 
         // Reddirect to Start with error log
-        var render = <Redirect to="/?loginError=true" />;
+        render = <Redirect to="/?loginError=true" />;
     }
 
     // Refresh Token Present -> Get a new Access Token and go to Home
-    else if (cookies.refresh_token) {
-        // There is an Access Token
-        if (cookies.access_token) {
-            console.log("Refresh and Aceess Tokens Present -> Remember Me");
-            render = null;
-        } else {
-            console.log("Refresh Token Present -> Get Access Token");
-            render = null;
-        }
+    else if (cookies.reddon_refresh_token) {
+        console.log("Refresh Token Present -> Get Access Token");
+
+        // Get the access and refresh tokens for the first time
+        setAccessGranted(refreshAccessToken());
+
+        render = null;
     }
 
     // No Refresh Token -> Log in Process
@@ -57,7 +63,7 @@ export default function Landing(props) {
                 console.log("Login Done -> Fetch Access and Refresh Tokens");
 
                 // Get the access and refresh tokens for the first time
-                setAccessGranted(getAccessToken(urlParams.code, process.env.REACT_APP_REDIRECT_URI));
+                setAccessGranted(requestAccessToken(urlParams.code));
 
                 render = null;
             }
@@ -70,7 +76,7 @@ export default function Landing(props) {
                 clearCookies();
 
                 // Reddirect to Start with error log
-                var render = <Redirect to="/?loginError=true" />;
+                render = <Redirect to="/?loginError=true" />;
             }
         }
 
@@ -82,17 +88,21 @@ export default function Landing(props) {
             const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
             const REACT_APP_CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
             const RANDOM_STRING = randomstring.generate(50);
-            const link = `https://www.reddit.com/api/v1/authorize.compact?client_id=${REACT_APP_CLIENT_ID}&response_type=code&state=${RANDOM_STRING}&redirect_uri=${REDIRECT_URI}&duration=permanent&scope=vote`;
+            const link = `https://www.reddit.com/api/v1/authorize.compact?client_id=${REACT_APP_CLIENT_ID}&response_type=code&state=${RANDOM_STRING}&redirect_uri=${REDIRECT_URI}&duration=permanent&scope=vote read`;
 
             // Save state random string
             setCookie("reddon_state", RANDOM_STRING);
 
-            console.log(urlParams);
-
             // Render Landing Page
             render = (
-                <div>
-                    {urlParams.loginError ? <p>Login Error</p> : null}
+                <div className="landing">
+                    <div className="logo">
+                        <span className="appName">redd</span>
+                        <SVG className="icon" src={Logo} />
+                        <span className="appName">n</span>
+                    </div>
+                    <div className="flexGrow"></div>
+                    {urlParams.loginError ? <div className="error">Login error, try again!</div> : null}
                     <a href={link} className="link">
                         Log in with Reddit
                     </a>
