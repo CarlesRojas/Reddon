@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import App from "./App";
 import EventsPubSub from "./EventsPubSub";
 import UtilsProvider from "contexts/Utils";
-import APIProvider from "contexts/API";
+import RedditProvider from "contexts/Reddit";
 import "fonts/VAGRoundedStd-Light.ttf";
 
 import "./index.scss";
@@ -14,9 +14,9 @@ window.PubSub = new EventsPubSub();
 
 ReactDOM.render(
     <UtilsProvider>
-        <APIProvider>
+        <RedditProvider>
             <App />
-        </APIProvider>
+        </RedditProvider>
     </UtilsProvider>,
     document.getElementById("root")
 );

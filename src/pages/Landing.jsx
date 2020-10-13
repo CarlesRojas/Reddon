@@ -5,15 +5,15 @@ import qs from "qs";
 import SVG from "react-inlinesvg";
 
 // Contexts
-import { API } from "contexts/API";
+import { Reddit } from "contexts/Reddit";
 import { Utils } from "contexts/Utils";
 
-// Logo
+// Icons
 import Logo from "resources/ReddonLogo.svg";
 
 export default function Landing(props) {
     // Contexts
-    const { requestAccessToken, refreshAccessToken } = useContext(API);
+    const { requestAccessToken, refreshAccessToken } = useContext(Reddit);
     const { setCookie, getCookies, clearCookies } = useContext(Utils);
 
     // State
@@ -22,10 +22,6 @@ export default function Landing(props) {
 
     // Get the url parameters
     const urlParams = qs.parse(props.location.search, { ignoreQueryPrefix: true });
-
-    // Set dark mode
-    //document.body.classList.remove("dark");
-    //document.body.classList.add("dark");
 
     // Access is Granted -> Go to Home
     if (accessGranted) {

@@ -1,16 +1,32 @@
-import React, { useRef, createContext, useContext } from "react";
+import React, { useState, useRef, createContext, useContext } from "react";
 
 import { Utils } from "contexts/Utils";
 
-// API Context
-export const API = createContext();
+// Reddit Context
+export const Reddit = createContext();
 
-const APIProvider = (props) => {
+const RedditProvider = (props) => {
     // Context
     const { setCookie, getCookie } = useContext(Utils);
 
-    // State
+    // Refresh token timeout
     const refreshTimeout = useRef(null);
+
+    // Current subreddit
+    const [currentSubreddit, setCurrentSubreddit] = useState("all");
+
+    // All posts and next
+    const [allPosts, setAllPosts] = useState([]);
+    const allAfter = useRef("");
+
+    // Home posts and next
+    const [homePosts, setHomePosts] = useState([]);
+    const homeAfter = useRef("");
+
+    // Custom subreddit posts and next
+    const subredditName = useRef("");
+    const [subredditPosts, setSubredditPosts] = useState([]);
+    const subredditAfter = useRef("");
 
     // Check and return access token
     const getAccessToken = async () => {
@@ -63,7 +79,7 @@ const APIProvider = (props) => {
         return true;
     };
 
-    // Retrieve the aacess and refresh tokens for the first time
+    // Retrieve the access and refresh tokens for the first time
     const requestAccessToken = async (code) => {
         // Post data
         const POST_DATA = new FormData();
@@ -95,11 +111,24 @@ const APIProvider = (props) => {
         return true;
     };
 
-    const getPostsAll = async () => {
+    // Set current subreddit
+    const setSubreddit = async () => {};
+
+    // Retrieve the next posts of the specified subreddit
+    const getPosts = async (subreddit) => {
         var accessToken = await getAccessToken();
 
+        // Set default parameters
+        if (!subreddit) subreddit = "all";
+
+        // Set the after parameter
+        if (subreddit === "all" && allAfter.current) var after = `&after=${allAfter.current}`;
+        else if (subreddit === "home" && homeAfter.current) after = `&after=${homeAfter.current}`;
+        else if (subreddit === subredditName.current && subredditAfter.current) after = `&after=${subredditAfter.current}`;
+        else after = "";
+
         // Fetch
-        var rawResponse = await fetch("https://oauth.reddit.com/r/all.json", {
+        var rawResponse = await fetch(`https://oauth.reddit.com/r/${subreddit}.json?raw_json=1&limit=10${after}`, {
             headers: {
                 Accept: "application/json, text/plain, */*",
                 Authorization: "bearer " + accessToken,
@@ -107,21 +136,54 @@ const APIProvider = (props) => {
         });
         const response = await rawResponse.json();
 
+        // Save posts to all
+        if (subreddit === "all") {
+            setAllPosts([...allPosts, ...response.data.children]);
+            allAfter.current = response.data.after;
+        }
+
+        // Save posts to home
+        else if (subreddit === "home") {
+            setHomePosts([...homePosts, ...response.data.children]);
+            homeAfter.current = response.data.after;
+        }
+
+        // Save posts to home
+        else {
+            // If its the same subreddit -> Add posts to the list
+            if (subredditName.current === subreddit) {
+                setSubredditPosts([...subredditPosts, ...response.data.children]);
+                subredditAfter.current = response.data.after;
+            }
+
+            // New subreddit -> Clear list and add save the posts
+            else {
+                subredditName.current = subreddit;
+                setSubredditPosts(response.data.children);
+                subredditAfter.current = response.data.after;
+            }
+        }
+
         console.log(response);
     };
 
     // Return the context
     return (
-        <API.Provider
+        <Reddit.Provider
             value={{
+                currentSubreddit,
+                setCurrentSubreddit,
+                allPosts,
+                homePosts,
+                subredditPosts,
                 requestAccessToken,
                 refreshAccessToken,
-                getPostsAll,
+                getPosts,
             }}
         >
             {props.children}
-        </API.Provider>
+        </Reddit.Provider>
     );
 };
 
-export default APIProvider;
+export default RedditProvider;

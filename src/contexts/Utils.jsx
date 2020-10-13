@@ -59,6 +59,19 @@ const UtilsProvider = (props) => {
         }
     };
 
+    // #######################################
+    //      INTERPOLATIONS
+    // #######################################
+
+    // Clamp a value between a min and max
+    const clamp = (a, min = 0, max = 1) => Math.min(max, Math.max(min, a));
+
+    // Linear interpolation
+    const lerp = (start, end, t) => start * (1 - t) + end * t;
+
+    // Inverse linear interpolation
+    const invlerp = (x, y, a) => clamp((a - x) / (y - x));
+
     return (
         <Utils.Provider
             value={{
@@ -67,6 +80,9 @@ const UtilsProvider = (props) => {
                 deleteCookie,
                 getCookies,
                 clearCookies,
+                clamp,
+                lerp,
+                invlerp,
             }}
         >
             {props.children}

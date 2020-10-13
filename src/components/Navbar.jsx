@@ -1,24 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import SVG from "react-inlinesvg";
 
+// Contexts
+import { Reddit } from "contexts/Reddit";
+
+// Icons
 import RefreshIcon from "resources/Refresh.svg";
 
 export default function Navbar() {
-    const [selectedPage, setSelectedPage] = useState("home");
+    // Contexts
+    const { currentSubreddit, setCurrentSubreddit } = useContext(Reddit);
+
+    // State
     const [pageSwapped, setPageSwapped] = useState(false);
 
     // Swap page
     const swapPage = (page) => {
         setPageSwapped(true);
-        setSelectedPage(page);
+        setCurrentSubreddit(page);
     };
 
-    // Set dark mode
-    //document.body.classList.remove("dark");
-    //document.body.classList.add("dark");
-
     // Animate the page buttons
-    if (pageSwapped && selectedPage === "home") var backgroundStyle = " left";
+    if (pageSwapped && currentSubreddit === "all") var backgroundStyle = " left";
     else if (pageSwapped) backgroundStyle = " right";
     else backgroundStyle = "";
 
@@ -27,11 +30,11 @@ export default function Navbar() {
             <SVG className="icon invisible" src={RefreshIcon} />
             <div className="pageSelector">
                 <div className={"background" + backgroundStyle}></div>
-                <div className={"title" + (selectedPage === "home" ? " selected" : "")} onClick={() => swapPage("home")}>
-                    home
-                </div>
-                <div className={"title" + (selectedPage === "all" ? " selected" : "")} onClick={() => swapPage("all")}>
+                <div className={"title" + (currentSubreddit === "all" ? " selected" : "")} onClick={() => swapPage("all")}>
                     all
+                </div>
+                <div className={"title" + (currentSubreddit === "home" ? " selected" : "")} onClick={() => swapPage("home")}>
+                    home
                 </div>
             </div>
             <SVG className="icon spin" src={RefreshIcon} />

@@ -296,14 +296,78 @@ button {
 /*      PAGE                               */
 /* ####################################### */
 
-.pageContainer {
-    box-sizing: border-box;
-    margin: $main-margin;
+.page {
+    position: relative;
     flex-grow: 1;
-    background-color: $foreground;
-    border-radius: $border-radius;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
 
-    .dark & {
-        background: $foreground-dark;
+    .scroll {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        will-change: transform;
+
+        .container {
+            position: relative;
+            background-image: url("https://images.pexels.com/photos/62689/pexels-photo-62689.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
+            touch-action: none;
+            width: 100%;
+            height: 100%;
+            will-change: transform;
+            @include shadow();
+        }
+    }
+}
+
+/*
+.pageContainer {
+    position: relative;
+    box-sizing: border-box;
+    flex-grow: 1;
+    background-color: rgba(255, 0, 0, 0.082);
+    overflow: scroll;
+    //scroll-snap-type: x mandatory;
+
+    .scroll {
+        position: relative;
+        height: 100%;
+
+        .list {
+            position: relative;
+            height: 100%;
+            padding: 0;
+            list-style-type: none;
+            display: flex;
+
+            .post {
+                position: relative;
+                //scroll-snap-align: start;
+                width: 100vw;
+                height: 100%;
+                background: linear-gradient(90deg, rgb(184, 184, 184) 0%, rgb(70, 70, 70) 100%);
+            }
+        }
+    }
+}
+*/
+
+.deleteContainer {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: $main-margin;
+
+    .delete {
+        background-color: rgba(122, 122, 122, 0.397);
+        border-radius: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5px 10px;
+        font-size: 0.75rem;
+        margin: 0 5px;
     }
 }
