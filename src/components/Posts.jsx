@@ -19,22 +19,25 @@ export default function Posts(props) {
     const { clamp } = useContext(Utils);
 
     // State
+    const [currIndex, setCurrIndex] = useState(0);
     const index = useRef(0);
     const postLength = useRef(0);
     const totalWidth = useRef(posts.length * rowWidth);
     const gestureCancelled = useRef(false);
 
     // All springs
+    const currMode = useRef("normal"); // "normal", "small"
     const [postMode, setPostMode] = useState("normal"); // "normal", "small"
     const [{ scale }, zoomSet] = useSpring(() => ({ scale: 1 }));
     const [properties, set] = useSprings(posts.length, (i) => ({ x: i * rowWidth, visible: i === index.current ? 1 : 0 }));
 
     // Handle inertia frame
     const onFrameHandle = (xDispl) => {
-        if (postMode === "small") {
+        if (currMode.current === "small") {
             // Set the current index
-            var newIndex = clamp(Math.round(-xDispl / rowWidth), postLength.current - 1);
+            var newIndex = clamp(Math.round(-xDispl / rowWidth), 0, postLength.current - 1);
             index.current = newIndex;
+            setCurrIndex(newIndex);
         }
     };
 
@@ -62,6 +65,7 @@ export default function Posts(props) {
 
                 // Do not change index if distance does not have the same direction as velocity
                 cancel((index.current = newIndex));
+                setCurrIndex(newIndex);
             }
 
             // Last frame
@@ -110,6 +114,7 @@ export default function Posts(props) {
         if (subreddit !== zoomSubreddit) return;
 
         zoomSet({ scale: postMode === "normal" ? 0.7 : 1 });
+        currMode.current = postMode === "normal" ? "small" : "normal";
         setPostMode(postMode === "normal" ? "small" : "normal");
     };
 
@@ -121,15 +126,14 @@ export default function Posts(props) {
 
     // Update position when index changes
     useEffect(() => {
-        if (postMode === "normal") {
-            console.log("Set position");
+        if (postMode === "small") {
             set((i) => {
-                const xValue = (i - index.current) * rowWidth;
-                const visible = i === index.current ? 1 : 0;
+                const xValue = (i - currIndex) * rowWidth;
+                const visible = i === currIndex ? 1 : 0;
                 return { x: xValue, visible };
             });
         }
-    }, [postMode, set]);
+    }, [currIndex, postMode, set]);
 
     // Listen for the zoom to change
     useEffect(() => {
