@@ -1,5 +1,5 @@
 import React, { useState, useContext, useRef } from "react";
-import { useSprings, animated } from "react-spring";
+import { useSpring, useSprings, animated } from "react-spring";
 import { useDrag } from "react-use-gesture";
 
 import Navbar from "components/Navbar";
@@ -9,56 +9,113 @@ import Post from "components/Post";
 import { Reddit } from "contexts/Reddit";
 import { Utils } from "contexts/Utils";
 
+// Size of the viewport
+const rowWidth = window.innerWidth;
+
 export default function Home() {
     // Contexts
-    const { currentSubreddit, getPosts, allPosts, homePosts, subredditPosts } = useContext(Reddit);
+    const { currentSubreddit, getPosts, allPosts, homePosts } = useContext(Reddit);
     const { clamp } = useContext(Utils);
 
     // State
+    const allIndex = useRef(0);
+    const homeIndex = useRef(0);
+    const gestureCancelled = useRef(false);
     const subreddit = useRef("");
-    const index = useRef(0);
-    const list = currentSubreddit === "all" ? allPosts : currentSubreddit === "home" ? homePosts : subredditPosts;
 
-    // If there is a change in subreddit -> Reset counter
-    if (currentSubreddit !== subreddit.current) {
-        console.log("Change");
-        subreddit.current = currentSubreddit;
-        index.current = 0;
-    }
+    // Navigation spring
+    const [navAllProperties, navAllSet] = useSpring(() => ({ x: 0 }));
+    const [navHomeProperties, navHomeSet] = useSpring(() => ({ x: rowWidth }));
 
-    // Springs for each post
-    const [properties, setSprings] = useSprings(list.length, (i) => ({
-        x: i * window.innerWidth,
-        scale: 1,
-        display: "block",
-    }));
+    // All springs
+    const [allPostMode, setAllPostMode] = useState("normal"); // "normal", "small"
+    const [allZoomProperties, allZoomSet] = useSpring(() => ({ scale: 1 }));
+    const [allProperties, allSet] = useSprings(allPosts.length, (i) => ({ x: i * rowWidth, display: "block" }));
 
-    // Set the gesture hook
-    const bind = useDrag(({ down, vxvy: [vx], movement: [mx], direction: [xDir], distance, cancel }) => {
-        // Snap to next post if the post is moved half the distance or with great speed
-        if (down && (distance > window.innerWidth / 2 || Math.abs(vx) > 0.8)) {
-            cancel((index.current = clamp(index.current + (xDir > 0 ? -1 : 1), 0, list.length - 1)));
+    // Home springs
+    const [homePostMode, setHomePostMode] = useState("normal"); // "normal", "small"
+    const [homeZoomProperties, homeZoomSet] = useSpring(() => ({ scale: 1 }));
+    const [homeProperties, homeSet] = useSprings(homePosts.length, (i) => ({ x: i * rowWidth, display: "block" }));
+
+    // Set the gesture hook for the all posts
+    const allBind = useDrag(({ down, first, last, vxvy: [vx], movement: [mx], direction: [xDir], distance, cancel }) => {
+        // Start the gesture -> Not cancelled
+        if (first) gestureCancelled.current = false;
+
+        // Snap to next post if the post is moved half the distance or is released at great speed
+        if (!gestureCancelled.current && ((down && distance > rowWidth * 0.4) || (last && Math.abs(vx) > 0.15))) {
+            gestureCancelled.current = true;
+            cancel((allIndex.current = clamp(allIndex.current + (xDir > 0 ? -1 : 1), 0, allPosts.length - 1)));
         }
 
         // Set the springs values
-        setSprings((i) => {
-            if (i < index.current - 1 || i > index.current + 1) return { display: "none" };
-            const x = (i - index.current) * window.innerWidth + (down ? mx : 0);
-            const scale = down ? 1 - (distance / window.innerWidth) * 0.25 : 1;
-            if (i === 0) console.log({ x, scale, display: "block" });
-            return { x, scale, display: "block" };
+        allSet((i) => {
+            if (i < allIndex.current - 1 || i > allIndex.current + 1) return { display: "none" };
+            const x = (i - allIndex.current) * rowWidth + (down ? mx : 0);
+            return { x, display: "block" };
         });
     });
+
+    // Set the gesture hook for the home posts
+    const homeBind = useDrag(({ down, first, last, vxvy: [vx], movement: [mx], direction: [xDir], distance, cancel }) => {
+        // Start the gesture -> Not cancelled
+        if (first) gestureCancelled.current = false;
+
+        // Snap to next post if the post is moved half the distance or is released at great speed
+        if (!gestureCancelled.current && ((down && distance > rowWidth * 0.4) || (last && Math.abs(vx) > 0.15))) {
+            gestureCancelled.current = true;
+            cancel((homeIndex.current = clamp(homeIndex.current + (xDir > 0 ? -1 : 1), 0, homePosts.length - 1)));
+        }
+
+        // Set the springs values
+        homeSet((i) => {
+            if (i < homeIndex.current - 1 || i > homeIndex.current + 1) return { display: "none" };
+            const x = (i - homeIndex.current) * rowWidth + (down ? mx : 0);
+            return { x, display: "block" };
+        });
+    });
+
+    // Swap post mode
+    const swapPostMode = () => {
+        if (currentSubreddit === "all") {
+            allZoomSet({ scale: allPostMode === "normal" ? 0.7 : 1 });
+            setAllPostMode(allPostMode === "normal" ? "small" : "normal");
+        } else {
+            homeZoomSet({ scale: homePostMode === "normal" ? 0.7 : 1 });
+            setHomePostMode(homePostMode === "normal" ? "small" : "normal");
+        }
+    };
+
+    // If there is a change in subreddit -> Swap to that
+    if (currentSubreddit !== subreddit.current) {
+        subreddit.current = currentSubreddit;
+        navAllSet({ x: currentSubreddit === "all" ? 0 : -rowWidth });
+        navHomeSet({ x: currentSubreddit === "home" ? 0 : rowWidth });
+    }
 
     return (
         <div className="app">
             <Navbar></Navbar>
 
-            <div className="page">
-                {properties.map(({ x, display, scale }, i) => {
+            <div className={"home" + (currentSubreddit === "all" ? "" : " invisible")}>
+                {allProperties.map(({ x, display }, i) => {
+                    const { scale } = allZoomProperties;
+
                     return (
-                        <animated.div className="scroll" {...bind()} key={i} style={{ display, x }}>
-                            <animated.div className="container" style={{ scale }} />
+                        <animated.div className="container" {...allBind()} key={i} style={{ display, x, scale }}>
+                            <Post></Post>
+                        </animated.div>
+                    );
+                })}
+            </div>
+
+            <div className={"home" + (currentSubreddit === "home" ? "" : " invisible")}>
+                {homeProperties.map(({ x, display }, i) => {
+                    const { scale } = homeZoomProperties;
+
+                    return (
+                        <animated.div className="container" {...homeBind()} key={i} style={{ display, x, scale }}>
+                            <Post></Post>
                         </animated.div>
                     );
                 })}
@@ -77,91 +134,10 @@ export default function Home() {
                 <div className="delete" onClick={() => getPosts("tifu")}>
                     Load tifu
                 </div>
-            </div>
-        </div>
-    );
-}
-/*
-
-import React, { useState, useContext, useRef } from "react";
-import { useSpring, a, config } from "react-spring";
-import { useDrag } from "react-use-gesture";
-
-import Navbar from "components/Navbar";
-import Post from "components/Post";
-
-// Contexts
-import { Reddit } from "contexts/Reddit";
-
-// Size of the viewport
-const rowWidth = window.innerWidth;
-
-export default function Home(props) {
-    // Contexts
-    const { currentSubreddit, getPosts, allPosts, homePosts, subredditPosts } = useContext(Reddit);
-
-    // State
-    const subreddit = useRef("");
-    const [scrollLeft, setScrollLeft] = useState(0);
-
-    // If there is a change in subreddit -> Reset counter
-    if (currentSubreddit !== subreddit.current) {
-        subreddit.current = currentSubreddit;
-    }
-
-    //getPosts("all");
-
-    const list = currentSubreddit === "all" ? allPosts : currentSubreddit === "home" ? homePosts : subredditPosts;
-    const numColumns = list.length > 0 ? list.length : 20;
-
-    const startIndex = Math.max(0, Math.floor(scrollLeft / rowWidth) - 2);
-    const endIndex = Math.min(startIndex + 5, numColumns);
-    const totalWidth = rowWidth * numColumns;
-    const paddingLeft = startIndex * rowWidth;
-
-    // List to be rendered
-    const renderedItems = [];
-    let index = startIndex;
-
-    // Add all items that will be shown
-    while (index < endIndex) {
-        if (index < list.length) {
-            renderedItems.push(<Post key={index} info={list[index]}></Post>);
-        } else {
-            renderedItems.push(<Post key={index}></Post>);
-        }
-        ++index;
-    }
-
-    return (
-        <div className="app">
-            <Navbar></Navbar>
-            <div
-                className="pageContainer"
-                onScroll={(event) => {
-                    setScrollLeft(event.target.scrollLeft);
-                }}
-            >
-                <div className="scroll" style={{ width: totalWidth - paddingLeft, paddingLeft: paddingLeft }}>
-                    <ol className="list">{renderedItems}</ol>
-                </div>
-            </div>
-
-            <div className="deleteContainer">
-                <div className="delete" onClick={() => getPosts("all")}>
-                    Load All
-                </div>
-                <div className="delete" onClick={() => getPosts("home")}>
-                    Load Home
-                </div>
-                <div className="delete" onClick={() => getPosts("funny")}>
-                    Load funny
-                </div>
-                <div className="delete" onClick={() => getPosts("tifu")}>
-                    Load tifu
+                <div className="delete" onClick={() => swapPostMode()}>
+                    M
                 </div>
             </div>
         </div>
     );
 }
-*/

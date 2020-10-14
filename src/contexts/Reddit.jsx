@@ -111,9 +111,6 @@ const RedditProvider = (props) => {
         return true;
     };
 
-    // Set current subreddit
-    const setSubreddit = async () => {};
-
     // Retrieve the next posts of the specified subreddit
     const getPosts = async (subreddit) => {
         var accessToken = await getAccessToken();
