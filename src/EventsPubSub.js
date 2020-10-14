@@ -28,6 +28,6 @@ export default class EventsPubSub {
      EVENTS
 #######################################
 
-    onCloseSongActions:         Called when the song actions should close               ({id})          id: id of the song that sends the signal (only in some cases, null otherwise)
+    onPostsZoomChange:      Called when the zoom should change               ({subreddit})          subreddit: "all", "home" or "subreddit" <- Subreddit where the zoom is happening
 
 */
