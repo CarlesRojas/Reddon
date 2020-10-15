@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from "react";
+import React, { useContext, useRef } from "react";
 import { useSpring, animated } from "react-spring";
 
 import Navbar from "components/Navbar";
@@ -16,21 +16,12 @@ export default function Home() {
 
     // State
     const subreddit = useRef("");
-    const [resting, setResting] = useState(true);
-
-    // Handle end start
-    const onRestHandle = () => {
-        console.log("Rest");
-        setResting(true);
-    };
 
     // Navigation spring
-    const [{ x }, navSet] = useSpring(() => ({ x: 0, onRest: onRestHandle }));
+    const [{ x }, navSet] = useSpring(() => ({ x: 0 }));
 
     // If there is a change in subreddit -> Swap to that
     if (currentSubreddit !== subreddit.current) {
-        if (subreddit.current) setResting(false);
-
         subreddit.current = currentSubreddit;
         navSet({ x: currentSubreddit === "all" ? 0 : -rowWidth });
     }
@@ -40,8 +31,8 @@ export default function Home() {
             <Navbar></Navbar>
 
             <animated.div className="home" style={{ x }}>
-                <Posts subreddit="all" focused={subreddit.current === "all" && resting} posts={allPosts}></Posts>
-                <Posts subreddit="home" focused={subreddit.current === "home" && resting} posts={homePosts}></Posts>
+                <Posts subreddit="all" posts={allPosts}></Posts>
+                <Posts subreddit="home" posts={homePosts}></Posts>
             </animated.div>
 
             <div className="deleteContainer">
