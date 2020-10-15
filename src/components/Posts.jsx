@@ -13,7 +13,7 @@ const rowWidth = window.innerWidth;
 
 export default function Posts(props) {
     // Props
-    const { subreddit, posts } = props;
+    const { subreddit, posts, focused } = props;
 
     // Contexts
     const { clamp } = useContext(Utils);
@@ -31,8 +31,8 @@ export default function Posts(props) {
     const [{ scale }, zoomSet] = useSpring(() => ({ scale: 1 }));
     const [properties, set] = useSprings(posts.length, (i) => ({ x: i * rowWidth, visible: i === index.current ? 1 : 0 }));
 
-    // Handle inertia frame
-    const onFrameHandle = (xDispl) => {
+    // Handle inertia change
+    const onChangeHandle = (xDispl) => {
         if (currMode.current === "small") {
             // Set the current index
             var newIndex = clamp(Math.round(-xDispl / rowWidth), 0, postLength.current - 1);
@@ -44,7 +44,7 @@ export default function Posts(props) {
     // Inertia
     const [{ x }, setX] = useInertia({
         x: 0,
-        onChange: onFrameHandle,
+        onChange: onChangeHandle,
     });
 
     // Set the gesture hook for the all posts
@@ -110,8 +110,11 @@ export default function Posts(props) {
         { initial: () => [x.get(), 0], bounds: { left: rowWidth - totalWidth.current, right: 0 }, rubberband: true }
     );
 
+    // Handles a change in the zoom
     const zoomChangeHandle = ({ subreddit: zoomSubreddit }) => {
         if (subreddit !== zoomSubreddit) return;
+
+        console.log("ZOOM CHANGE");
 
         zoomSet({ scale: postMode === "normal" ? 0.7 : 1 });
         currMode.current = postMode === "normal" ? "small" : "normal";
@@ -135,26 +138,36 @@ export default function Posts(props) {
         }
     }, [currIndex, postMode, set]);
 
-    // Listen for the zoom to change
+    // Listen for the events
     useEffect(() => {
-        window.PubSub.sub("onPostsZoomChange", zoomChangeHandle);
+        window.PubSub.sub("onZoomChange", zoomChangeHandle);
 
         return function cleanup() {
-            window.PubSub.unsub("onPostsZoomChange", zoomChangeHandle);
+            window.PubSub.unsub("onZoomChange", zoomChangeHandle);
         };
     });
 
+    // Container style
     if (postMode === "normal") var containerStyle = {};
     else containerStyle = { x };
 
+    // Container Class
+    if (subreddit === "all") var containerClass = "container" + (postMode === "small" ? " small" : "") + (focused ? "" : " notFocused");
+    else containerClass = "container right" + (postMode === "small" ? " small" : "") + (focused ? "" : " notFocused");
+
     return (
-        <animated.div {...containerBind()} className={"container" + (postMode === "small" ? " small" : "")} style={containerStyle}>
+        <animated.div {...containerBind()} className={containerClass} style={containerStyle}>
             {properties.map(({ x, visible }, i) => {
+                // Style if not zoomed
                 if (postMode === "normal") var style = { x, display: visible.to((displ) => (displ === 0 ? "none" : "block")) };
                 else style = {};
 
+                // Class if not focused
+                if (!focused && i !== index.current && postMode === "small") var notFucusedClass = " invisible";
+                else notFucusedClass = "";
+
                 return (
-                    <animated.div key={i} className="posts" {...postsBind()} style={style}>
+                    <animated.div key={i} className={"posts" + notFucusedClass} {...postsBind()} style={style}>
                         <animated.div className="zoom" style={{ scale }}>
                             <Post i={i}></Post>
                         </animated.div>

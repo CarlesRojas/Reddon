@@ -28,6 +28,5 @@ export default class EventsPubSub {
      EVENTS
 #######################################
 
-    onPostsZoomChange:      Called when the zoom should change               ({subreddit})          subreddit: "all", "home" or "subreddit" <- Subreddit where the zoom is happening
-
+    onZoomChange:      Called when the zoom should change               ({subreddit})          subreddit: "all", "home" or "subreddit" <- Subreddit where the zoom is happening
 */
