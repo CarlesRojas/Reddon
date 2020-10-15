@@ -308,6 +308,7 @@ button {
         width: 100vw;
         height: 100%;
         left: 0;
+        //clip-path: inset(30% 30% 30% 30%);
 
         &.right {
             left: 100vw;
@@ -324,6 +325,7 @@ button {
             .posts {
                 position: relative;
                 display: block !important;
+                width: 75vw;
             }
         }
 
@@ -339,7 +341,7 @@ button {
             }
 
             .zoom {
-                width: 100%;
+                width: 100vw;
                 height: 100%;
 
                 .post {

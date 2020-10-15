@@ -10,6 +10,7 @@ import { Utils } from "contexts/Utils";
 
 // Size of the viewport
 const rowWidth = window.innerWidth;
+const rowWidthSmall = window.innerWidth * 0.75;
 
 export default function Posts(props) {
     // Props
@@ -22,7 +23,7 @@ export default function Posts(props) {
     const [currIndex, setCurrIndex] = useState(0);
     const index = useRef(0);
     const postLength = useRef(0);
-    const totalWidth = useRef(posts.length * rowWidth);
+    const totalWidth = useRef(posts.length * rowWidthSmall);
     const gestureCancelled = useRef(false);
 
     // All springs
@@ -32,10 +33,10 @@ export default function Posts(props) {
     const [properties, set] = useSprings(posts.length, (i) => ({ x: i * rowWidth, visible: i === index.current ? 1 : 0 }));
 
     // Handle inertia change
-    const onChangeHandle = (xDispl) => {
+    const onInertiaChangeHandle = (xDispl) => {
         if (currMode.current === "small") {
             // Set the current index
-            var newIndex = clamp(Math.round(-xDispl / rowWidth), 0, postLength.current - 1);
+            var newIndex = clamp(Math.round(-xDispl / rowWidthSmall), 0, postLength.current - 1);
             index.current = newIndex;
             setCurrIndex(newIndex);
         }
@@ -44,7 +45,7 @@ export default function Posts(props) {
     // Inertia
     const [{ x }, setX] = useInertia({
         x: 0,
-        onChange: onChangeHandle,
+        onChange: onInertiaChangeHandle,
     });
 
     // Set the gesture hook for the all posts
@@ -61,7 +62,7 @@ export default function Posts(props) {
                 const newIndex = clamp(index.current + indexDir, 0, posts.length - 1);
 
                 // Set the new index X
-                setX({ x: -newIndex * rowWidth, config: { decay: false, velocity: 0 } });
+                setX({ x: -newIndex * rowWidthSmall, config: { decay: false, velocity: 0 } });
 
                 // Do not change index if distance does not have the same direction as velocity
                 cancel((index.current = newIndex));
@@ -99,15 +100,15 @@ export default function Posts(props) {
                     // Get max index displacement
                     const indexDispl = Math.round(vx * -1.1);
                     const clampedIndexDispl = clamp(index.current + indexDispl, 0, posts.length - 1);
-                    if (vx < 0) var bounds = [-rowWidth * clampedIndexDispl, 0];
-                    else bounds = [rowWidth - totalWidth.current, -rowWidth * clampedIndexDispl];
+                    if (vx < 0) var bounds = [-rowWidthSmall * clampedIndexDispl, 0];
+                    else bounds = [rowWidthSmall - totalWidth.current, -rowWidthSmall * clampedIndexDispl];
 
                     // Set the inertia
                     setX({ x: mx, config: { inertia: true, bounds: { x: bounds }, velocities: { x: vx } } });
                 }
             }
         },
-        { initial: () => [x.get(), 0], bounds: { left: rowWidth - totalWidth.current, right: 0 }, rubberband: true }
+        { initial: () => [x.get(), 0], bounds: { left: rowWidthSmall - totalWidth.current, right: 0 }, rubberband: true }
     );
 
     // Handles a change in the zoom
@@ -123,7 +124,7 @@ export default function Posts(props) {
 
     // Update the total width when the posts change
     useEffect(() => {
-        totalWidth.current = posts.length * rowWidth;
+        totalWidth.current = posts.length * rowWidthSmall;
         postLength.current = posts.length;
     }, [posts]);
 
