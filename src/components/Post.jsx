@@ -72,7 +72,6 @@ export default function Post(props) {
     // Handle a click on the post
     const onPostClickHandle = () => {
         if (isZoomed.current) {
-            console.log("Clicked");
             window.PubSub.emit("onPostClicked", { subreddit, index: i });
         }
     };

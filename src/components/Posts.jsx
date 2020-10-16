@@ -45,7 +45,6 @@ export default function Posts(props) {
     const postClickedHandle = ({ subreddit: postSubreddit, index: postClickedIndex }) => {
         if (subreddit !== postSubreddit) return;
 
-        console.log("POST CLICKED " + postClickedIndex);
         // Snap to current post
         index.current = postClickedIndex;
         setX({ x: index.current * -ROW_WIDTH, config: { decay: false, velocity: 0 } });
@@ -74,7 +73,6 @@ export default function Posts(props) {
     const [scrollLeft, setScrollLeft] = useState(0);
     const index = useRef(0);
     const gestureCancelled = useRef(false);
-    console.log(index.current);
 
     // Refs that mirror the state
     const zoomedRef = useRef(zoomed);
@@ -135,9 +133,6 @@ export default function Posts(props) {
                     gestureCancelled.current = true;
 
                     // Get the new index
-                    //console.log("SWAP");
-                    //console.log(index.current);
-                    //console.log("");
                     const newIndex = clamp(index.current + (xDir > 0 ? -1 : 1), 0, Math.max(posts.length - 1, PLACEHOLDERS - 1));
 
                     // Cancel the event
