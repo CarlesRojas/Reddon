@@ -10,7 +10,7 @@ import { Utils } from "contexts/Utils";
 
 // Constants
 const ROW_WIDTH = window.innerWidth;
-const BUFFER = 5;
+const BUFFER = 8;
 const PLACEHOLDERS = 0;
 
 export default function Posts(props) {
@@ -97,14 +97,10 @@ export default function Posts(props) {
 
                 // When the gesture ends -> Apply inertia
                 else {
-                    // Get max index displacement
+                    // Use the Buffer size to get the bounds
                     const loadedBufferMin = Math.max(0, index.current - BUFFER + 1);
                     const loadedBufferMax = Math.min(posts.length - 1, index.current + BUFFER - 1);
-                    const indexDispl = clamp(index.current + Math.round(vx * -2), loadedBufferMin, loadedBufferMax);
-
-                    // Calculate the bounds for the spring
-                    if (vx < 0) var bounds = [-ROW_WIDTH * indexDispl, 0];
-                    else bounds = [ROW_WIDTH - totalWidth.current, -ROW_WIDTH * indexDispl];
+                    const bounds = [-ROW_WIDTH * loadedBufferMax, -ROW_WIDTH * loadedBufferMin];
 
                     // Set the inertia
                     setX({ x: mx, config: { inertia: true, bounds: { x: bounds }, velocities: { x: vx } } });
