@@ -9,7 +9,7 @@ const ROW_WIDTH = window.innerWidth;
 
 export default function Post(props) {
     // Props
-    const { i, zoomed, x } = props;
+    const { i, zoomed, x, subreddit } = props;
 
     // Contexts
     const { clamp } = useContext(Utils);
@@ -69,10 +69,18 @@ export default function Post(props) {
         };
     }
 
+    // Handle a click on the post
+    const onPostClickHandle = () => {
+        if (isZoomed.current) {
+            console.log("Clicked");
+            window.PubSub.emit("onPostClicked", { subreddit, index: i });
+        }
+    };
+
     return (
         <div className="post">
             <animated.div className="animatedPosition" style={{ ...animatedPositionStyle, ...animatedScale }}>
-                <animated.div className="content" style={{ ...contentStyle, ...animatedScale }}>
+                <animated.div className="content" style={{ ...contentStyle, ...animatedScale }} onClick={onPostClickHandle}>
                     {i}
                 </animated.div>
             </animated.div>

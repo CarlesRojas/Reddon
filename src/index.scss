@@ -357,16 +357,19 @@ button {
             padding: $main-margin;
             height: 100%;
             width: 100vw;
+            pointer-events: none;
 
             .animatedPosition {
                 position: relative;
                 width: 100%;
                 height: 100%;
+                pointer-events: none;
 
                 .content {
                     position: relative;
                     width: 100%;
                     height: 100%;
+                    pointer-events: all;
 
                     // Not important
                     background-image: url("https://images.pexels.com/photos/296878/pexels-photo-296878.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=500&w=500");
