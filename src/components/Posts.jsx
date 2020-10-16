@@ -10,8 +10,7 @@ import { Utils } from "contexts/Utils";
 
 // Constants
 const ROW_WIDTH = window.innerWidth;
-const ROW_WIDTH_SMALL = window.innerWidth * 0.75;
-const BUFFER = 10;
+const BUFFER = 5;
 const PLACEHOLDERS = 0;
 
 export default function Posts(props) {
@@ -31,6 +30,12 @@ export default function Posts(props) {
     // Handles a change in the zoom
     const zoomChangeHandle = ({ subreddit: zoomSubreddit }) => {
         if (subreddit !== zoomSubreddit) return;
+
+        // Snap to current post
+        if (zoomed) {
+            index.current = clamp(Math.round(-x.get() / ROW_WIDTH), 0, postsLengthRef.current - 1);
+            setX({ x: index.current * -ROW_WIDTH, config: { decay: false, velocity: 0 } });
+        }
 
         // Swap zoom scale and mode
         setZoomed(!zoomed);
@@ -74,7 +79,7 @@ export default function Posts(props) {
         setScrollLeft(-xDispl);
 
         // Set the current index
-        if (zoomedRef.current) index.current = clamp(Math.round(-xDispl / ROW_WIDTH_SMALL), 0, postsLengthRef.current - 1);
+        if (zoomedRef.current) index.current = clamp(Math.round(-xDispl / ROW_WIDTH), 0, postsLengthRef.current - 1);
     };
 
     // InertiaSpring
@@ -95,11 +100,11 @@ export default function Posts(props) {
                     // Get max index displacement
                     const loadedBufferMin = Math.max(0, index.current - BUFFER + 1);
                     const loadedBufferMax = Math.min(posts.length - 1, index.current + BUFFER - 1);
-                    const indexDispl = clamp(index.current + Math.round(vx * -1.1), loadedBufferMin, loadedBufferMax);
+                    const indexDispl = clamp(index.current + Math.round(vx * -2), loadedBufferMin, loadedBufferMax);
 
                     // Calculate the bounds for the spring
-                    if (vx < 0) var bounds = [-ROW_WIDTH_SMALL * indexDispl, 0];
-                    else bounds = [ROW_WIDTH_SMALL - totalWidth.current, -ROW_WIDTH_SMALL * indexDispl];
+                    if (vx < 0) var bounds = [-ROW_WIDTH * indexDispl, 0];
+                    else bounds = [ROW_WIDTH - totalWidth.current, -ROW_WIDTH * indexDispl];
 
                     // Set the inertia
                     setX({ x: mx, config: { inertia: true, bounds: { x: bounds }, velocities: { x: vx } } });
@@ -137,12 +142,11 @@ export default function Posts(props) {
     // #################################################
 
     // Current state settings
-    const currRowWidth = zoomed ? ROW_WIDTH_SMALL : ROW_WIDTH;
     const numColumns = posts.length > 0 ? posts.length : PLACEHOLDERS;
-    const startIndex = Math.max(0, Math.floor(scrollLeft / currRowWidth) - BUFFER);
+    const startIndex = Math.max(0, Math.floor(scrollLeft / ROW_WIDTH) - BUFFER);
     const endIndex = Math.min(startIndex + BUFFER * 2, numColumns);
-    const totalWidth = currRowWidth * numColumns;
-    const paddingLeft = startIndex * currRowWidth;
+    const totalWidth = ROW_WIDTH * numColumns;
+    const paddingLeft = startIndex * ROW_WIDTH;
 
     // Elements to be rendered
     const renderedItems = [];
@@ -150,8 +154,8 @@ export default function Posts(props) {
 
     // Add all items that will be shown
     while (i < endIndex) {
-        if (i < posts.length) renderedItems.push(<Post key={posts[i].data.id} i={i} zoomed={zoomed}></Post>);
-        else renderedItems.push(<Post key={i} i={-1} zoomed={zoomed}></Post>);
+        if (i < posts.length) renderedItems.push(<Post key={posts[i].data.id} i={i} zoomed={zoomed} x={x}></Post>);
+        else renderedItems.push(null);
         ++i;
     }
 
@@ -162,7 +166,7 @@ export default function Posts(props) {
     // Style for the container
     var containerStyle = {
         width: totalWidth - paddingLeft,
-        paddingLeft: paddingLeft,
+        paddingLeft,
         x,
     };
 
