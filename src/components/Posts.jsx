@@ -1,5 +1,5 @@
-import React, { useState, useContext, useRef, useEffect, useCallback } from "react";
-import { useSpring, useSprings, animated } from "react-spring";
+import React, { useState, useContext, useRef, useEffect } from "react";
+import { animated } from "react-spring";
 import { useDrag } from "react-use-gesture";
 
 import Post from "components/Post";
@@ -11,8 +11,8 @@ import { Utils } from "contexts/Utils";
 // Constants
 const ROW_WIDTH = window.innerWidth;
 const ROW_WIDTH_SMALL = window.innerWidth * 0.75;
-const BUFFER = 5;
-const PLACEHOLDERS = 10;
+const BUFFER = 10;
+const PLACEHOLDERS = 0;
 
 export default function Posts(props) {
     // Props
@@ -54,22 +54,28 @@ export default function Posts(props) {
     const index = useRef(0);
     const gestureCancelled = useRef(false);
 
-    const onInertiaChangeHandle = useCallback(
-        (xDispl) => {
-            setScrollLeft(-xDispl);
+    // Refs that mirror the state
+    const zoomedRef = useRef(zoomed);
+    const postsLengthRef = useRef(posts.length);
 
-            console.log(xDispl);
-            console.log(zoomed);
-            console.log(posts.length);
+    // Update zoomed ref
+    useEffect(() => {
+        zoomedRef.current = zoomed;
+    }, [zoomed]);
 
-            if (zoomed) {
-                // Set the current index
-                var newIndex = clamp(Math.round(-xDispl / ROW_WIDTH_SMALL), 0, posts.length - 1);
-                index.current = newIndex;
-            }
-        },
-        [zoomed, posts, clamp]
-    );
+    // Update postsLength ref
+    useEffect(() => {
+        postsLengthRef.current = posts.length;
+    }, [posts]);
+
+    // Update the index when the inertia position changes
+    const onInertiaChangeHandle = (xDispl) => {
+        // Set the current scroll left
+        setScrollLeft(-xDispl);
+
+        // Set the current index
+        if (zoomedRef.current) index.current = clamp(Math.round(-xDispl / ROW_WIDTH_SMALL), 0, postsLengthRef.current - 1);
+    };
 
     // InertiaSpring
     const [{ x }, setX] = useInertia({ x: 0, onChange: onInertiaChangeHandle });
@@ -87,7 +93,9 @@ export default function Posts(props) {
                 // When the gesture ends -> Apply inertia
                 else {
                     // Get max index displacement
-                    const indexDispl = clamp(index.current + Math.round(vx * -1.1), 0, posts.length - 1);
+                    const loadedBufferMin = Math.max(0, index.current - BUFFER + 1);
+                    const loadedBufferMax = Math.min(posts.length - 1, index.current + BUFFER - 1);
+                    const indexDispl = clamp(index.current + Math.round(vx * -1.1), loadedBufferMin, loadedBufferMax);
 
                     // Calculate the bounds for the spring
                     if (vx < 0) var bounds = [-ROW_WIDTH_SMALL * indexDispl, 0];
