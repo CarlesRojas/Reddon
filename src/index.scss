@@ -329,8 +329,7 @@ button {
 
 .posts {
     position: absolute;
-    overflow-y: hidden;
-    overflow-x: scroll;
+    overflow: hidden;
     height: 100%;
     width: 100vw;
     left: 0;
@@ -349,6 +348,7 @@ button {
     .container {
         height: 100%;
         display: flex;
+        touch-action: none;
 
         .post {
             position: relative;

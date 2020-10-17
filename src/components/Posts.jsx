@@ -1,9 +1,8 @@
 import React, { useState, useContext, useRef, useEffect } from "react";
-import { animated } from "react-spring";
+import { animated, useSpring } from "react-spring";
 import { useDrag } from "react-use-gesture";
 
 import Post from "components/Post";
-import { useInertia } from "components/Inertia";
 
 // Contexts
 import { Utils } from "contexts/Utils";
@@ -98,7 +97,7 @@ export default function Posts(props) {
     };
 
     // InertiaSpring
-    const [{ x }, setX] = useInertia({ x: 0, onChange: onInertiaChangeHandle });
+    const [{ x }, setX] = useSpring(() => ({ x: 0, onChange: onInertiaChangeHandle }));
 
     // Scroll Gesture
     const gestureBind = useDrag(
@@ -118,7 +117,7 @@ export default function Posts(props) {
                     const bounds = [-ROW_WIDTH * loadedBufferMax, -ROW_WIDTH * loadedBufferMin];
 
                     // Set the inertia
-                    setX({ x: mx, config: { inertia: true, bounds: { x: bounds }, velocities: { x: vx } } });
+                    setX({ x: mx, config: { decay: true, bounds: { x: bounds }, velocity: vx } });
                 }
             }
 
