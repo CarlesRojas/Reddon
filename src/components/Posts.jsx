@@ -2,7 +2,7 @@ import React, { useState, useContext, useRef, useEffect } from "react";
 import { animated, useSpring } from "react-spring";
 import { useDrag } from "react-use-gesture";
 
-import Post from "components/Post";
+import PostContainer from "components/PostContainer";
 
 // Contexts
 import { Utils } from "contexts/Utils";
@@ -160,7 +160,8 @@ export default function Posts(props) {
 
     // Add all items that will be shown
     while (i < endIndex) {
-        if (i < posts.length) renderedItems.push(<Post key={posts[i].data.id} i={i} zoomed={zoomed} x={x} subreddit={subreddit}></Post>);
+        if (i < posts.length)
+            renderedItems.push(<PostContainer key={posts[i].data.id} i={i} zoomed={zoomed} x={x} subreddit={subreddit}></PostContainer>);
         else renderedItems.push(null);
         ++i;
     }
