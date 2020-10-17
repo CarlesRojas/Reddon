@@ -1,6 +1,8 @@
 import React, { useContext, useRef } from "react";
 import { animated } from "react-spring";
 
+import Post from "./Post";
+
 // Contexts
 import { Utils } from "contexts/Utils";
 
@@ -9,7 +11,7 @@ const ROW_WIDTH = window.innerWidth;
 
 export default function PostContainer(props) {
     // Props
-    const { i, zoomed, x, subreddit } = props;
+    const { i, zoomed, x, subreddit, postData } = props;
 
     // Contexts
     const { clamp } = useContext(Utils);
@@ -79,7 +81,7 @@ export default function PostContainer(props) {
         <div className="postContainer">
             <animated.div className="animatedPosition" style={{ ...animatedPositionStyle, ...transitionStyle }}>
                 <animated.div className="animatedScale" style={{ ...animatedScaleStyle, ...transitionStyle }} onClick={onPostClickHandle}>
-                    {i}
+                    <Post postData={postData}></Post>
                 </animated.div>
             </animated.div>
         </div>

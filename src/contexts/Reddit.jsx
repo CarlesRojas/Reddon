@@ -28,6 +28,10 @@ const RedditProvider = (props) => {
     const [subredditPosts, setSubredditPosts] = useState([]);
     const subredditAfter = useRef("");
 
+    // Subreddit images and info
+    const subredditsInfo = useRef({});
+    const [subredditsInfoLoaded, setSubredditsInfoLoaded] = useState(false);
+
     // Check and return access token
     const getAccessToken = async () => {
         // Retrieve Access Token
@@ -111,6 +115,31 @@ const RedditProvider = (props) => {
         return true;
     };
 
+    // Fetch the info for the subreddits in the list
+    const fetchSubredditsInfo = async (posts, accessToken) => {
+        // Iterate the new posts
+        Promise.all(
+            posts.map(async ({ data }) => {
+                // Fetch info if not present
+                if (!(data.subreddit_id in subredditsInfo.current)) {
+                    // Fetch
+                    var rawResponse = await fetch(`https://oauth.reddit.com/r/${data.subreddit}/about`, {
+                        headers: {
+                            Accept: "application/json, text/plain, */*",
+                            Authorization: "bearer " + accessToken,
+                        },
+                    });
+                    const response = await rawResponse.json();
+
+                    // Save response
+                    subredditsInfo.current[data.subreddit_id] = response.data;
+                }
+            })
+        ).then(() => {
+            setSubredditsInfoLoaded(!subredditsInfoLoaded);
+        });
+    };
+
     // Retrieve the next posts of the specified subreddit
     const getPosts = async (subreddit) => {
         var accessToken = await getAccessToken();
@@ -145,7 +174,7 @@ const RedditProvider = (props) => {
             homeAfter.current = response.data.after;
         }
 
-        // Save posts to home
+        // Save posts to custom subreddit
         else {
             // If its the same subreddit -> Add posts to the list
             if (subredditName.current === subreddit) {
@@ -160,6 +189,9 @@ const RedditProvider = (props) => {
                 subredditAfter.current = response.data.after;
             }
         }
+
+        // Get info for the subreddits
+        fetchSubredditsInfo(response.data.children, accessToken);
 
         console.log(response);
     };
@@ -176,6 +208,8 @@ const RedditProvider = (props) => {
                 requestAccessToken,
                 refreshAccessToken,
                 getPosts,
+                subredditsInfo,
+                subredditsInfoLoaded,
             }}
         >
             {props.children}

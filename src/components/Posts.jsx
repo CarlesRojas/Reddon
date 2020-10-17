@@ -161,7 +161,9 @@ export default function Posts(props) {
     // Add all items that will be shown
     while (i < endIndex) {
         if (i < posts.length)
-            renderedItems.push(<PostContainer key={posts[i].data.id} i={i} zoomed={zoomed} x={x} subreddit={subreddit}></PostContainer>);
+            renderedItems.push(
+                <PostContainer key={posts[i].data.id} i={i} zoomed={zoomed} x={x} subreddit={subreddit} postData={posts[i].data}></PostContainer>
+            );
         else renderedItems.push(null);
         ++i;
     }

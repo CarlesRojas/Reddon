@@ -1,6 +1,6 @@
-/* ####################################### */
-/*      VARIABLES                          */
-/* ####################################### */
+// #######################################
+//      VARIABLES
+// #######################################
 
 $background: rgb(220, 220, 220);
 $foreground: rgb(245, 245, 245);
@@ -23,18 +23,18 @@ $orange: rgb(255, 69, 0);
 $blue: rgb(255, 69, 0);
 $gradient: linear-gradient(45deg, rgb(255, 104, 104) 0%, rgb(255, 153, 39) 100%);
 
-/* ####################################### */
-/*      MIXINS                             */
-/* ####################################### */
+// #######################################
+//      MIXINS
+// #######################################
 
 @mixin shadow($blur: 10px, $spread: 1px, $opacity: 0.2) {
     -webkit-box-shadow: 0px 0px $blur $spread rgba(0, 0, 0, $opacity);
     -moz-box-shadow: 0px 0px $blur $spread rgba(0, 0, 0, $opacity);
     box-shadow: 0px 0px $blur $spread rgba(0, 0, 0, $opacity);
 }
-/* ####################################### */
-/*      MAIN ELEMENTS                      */
-/* ####################################### */
+// #######################################
+//      MAIN ELEMENTS
+// #######################################
 
 @font-face {
     font-family: "Vag";
@@ -90,9 +90,9 @@ button {
     flex-direction: column;
 }
 
-/* ####################################### */
-/*      LANDING PAGE                       */
-/* ####################################### */
+// #######################################
+//      LANDING PAGE
+// #######################################
 
 .landing {
     width: 100%;
@@ -150,9 +150,9 @@ button {
     }
 }
 
-/* ####################################### */
-/*      LANDING PAGE                       */
-/* ####################################### */
+// #######################################
+//      LANDING PAGE
+// #######################################
 
 .navbar {
     box-sizing: border-box;
@@ -292,9 +292,9 @@ button {
     }
 }
 
-/* ####################################### */
-/*      HOME                               */
-/* ####################################### */
+// #######################################
+//      HOME
+// #######################################
 
 .home {
     position: relative;
@@ -323,9 +323,9 @@ button {
     }
 }
 
-/* ####################################### */
-/*      POSTS                              */
-/* ####################################### */
+// #######################################
+//      POSTS
+// #######################################
 
 .posts {
     position: absolute;
@@ -349,39 +349,91 @@ button {
         height: 100%;
         display: flex;
         touch-action: none;
+    }
+}
 
-        .postContainer {
+// #######################################
+//      POST CONTAINER
+// #######################################
+
+.postContainer {
+    position: relative;
+    box-sizing: border-box;
+    touch-action: none;
+    padding: $main-margin;
+    height: 100%;
+    width: 100vw;
+    pointer-events: none;
+
+    .animatedPosition {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+
+        .animatedScale {
             position: relative;
-            box-sizing: border-box;
-            touch-action: none;
-            padding: $main-margin;
+            width: 100%;
             height: 100%;
-            width: 100vw;
-            pointer-events: none;
-
-            .animatedPosition {
-                position: relative;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-
-                .animatedScale {
-                    position: relative;
-                    width: 100%;
-                    height: 100%;
-                    pointer-events: all;
-
-                    // Not important
-                    background-image: url("https://images.pexels.com/photos/296878/pexels-photo-296878.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=500&w=500");
-                    color: white;
-                    text-shadow: 0px 0px 5px rgb(0, 0, 0);
-                    font-size: 10rem;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: $border-radius;
-                }
-            }
+            pointer-events: all;
         }
     }
+}
+
+// #######################################
+//      POST
+// #######################################
+
+.post {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border-radius: $border-radius;
+    display: flex;
+    flex-direction: column;
+    background: $foreground;
+    padding: 8px;
+    align-items: center;
+
+    .dark & {
+        background: $foreground-dark;
+    }
+
+    .subredditIcon {
+        width: 40px;
+        border-radius: 50px;
+        margin-bottom: 5px;
+        @include shadow();
+    }
+
+    .subreddit {
+        text-transform: capitalize;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .author {
+        font-size: 0.7rem;
+        opacity: 0.5;
+        margin-bottom: 5px;
+    }
+
+    .title {
+        font-weight: 600;
+        font-size: 1.1rem;
+
+        .dark & {
+            font-weight: 500;
+        }
+    }
+    /*
+    background-image: url("https://images.pexels.com/photos/296878/pexels-photo-296878.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=500&w=500");
+    color: white;
+    text-shadow: 0px 0px 5px rgb(0, 0, 0);
+    font-size: 10rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    */
 }
