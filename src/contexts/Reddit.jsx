@@ -125,7 +125,7 @@ const RedditProvider = (props) => {
         else after = "";
 
         // Fetch
-        var rawResponse = await fetch(`https://oauth.reddit.com/r/${subreddit}.json?raw_json=1&limit=50${after}`, {
+        var rawResponse = await fetch(`https://oauth.reddit.com/r/${subreddit}.json?raw_json=1&limit=20${after}`, {
             headers: {
                 Accept: "application/json, text/plain, */*",
                 Authorization: "bearer " + accessToken,

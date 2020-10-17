@@ -9,7 +9,7 @@ import { Utils } from "contexts/Utils";
 
 // Constants
 const ROW_WIDTH = window.innerWidth;
-const BUFFER = 8;
+const BUFFER = 2;
 const PLACEHOLDERS = 0;
 
 export default function Posts(props) {
@@ -92,8 +92,15 @@ export default function Posts(props) {
         // Set the current scroll left
         setScrollLeft(-xDispl);
 
-        // Set the current index
-        if (zoomedRef.current) index.current = clamp(Math.round(-xDispl / ROW_WIDTH), 0, postsLengthRef.current - 1);
+        if (zoomedRef.current) {
+            // Set the current index
+            index.current = clamp(Math.round(-xDispl / ROW_WIDTH), 0, postsLengthRef.current - 1);
+
+            // Prevent from going out of bounds
+            const bounds = [-ROW_WIDTH * (postsLengthRef.current - 1), 0];
+            const bound = xDispl >= bounds[1] ? bounds[1] : xDispl <= bounds[0] ? bounds[0] : undefined;
+            if (bound !== undefined) setX({ x: bound, config: { decay: false, velocity: x.velocity } });
+        }
     };
 
     // InertiaSpring
@@ -105,20 +112,9 @@ export default function Posts(props) {
             // Zoomed -> Move with inertia
             if (zoomed) {
                 // While gesture is active -> Move without inertia
-                if (down) {
-                    setX({ x: mx, config: { decay: false, velocity: 0 } });
-                }
-
+                if (down) setX({ x: mx, config: { decay: false, velocity: 0 } });
                 // When the gesture ends -> Apply inertia
-                else {
-                    // Use the Buffer size to get the bounds
-                    const loadedBufferMin = Math.max(0, index.current - BUFFER + 1);
-                    const loadedBufferMax = Math.min(posts.length - 1, index.current + BUFFER - 1);
-                    const bounds = [-ROW_WIDTH * loadedBufferMax, -ROW_WIDTH * loadedBufferMin];
-
-                    // Set the inertia
-                    setX({ x: mx, config: { decay: true, bounds: { x: bounds }, velocity: vx } });
-                }
+                else setX({ x: mx, config: { decay: true, velocity: vx } });
             }
 
             // Not Zoomed -> Move a post at a time
@@ -144,7 +140,7 @@ export default function Posts(props) {
                 }
             }
         },
-        { initial: () => [zoomed ? x.get() : 0, 0], rubberband: true }
+        { initial: () => [zoomed ? x.get() : 0, 0], rubberband: true, bounds: { left: -ROW_WIDTH * (posts.length - 1), right: 0 } }
     );
 
     // #################################################

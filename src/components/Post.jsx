@@ -46,12 +46,6 @@ export default function Post(props) {
                 // When closeness is one, the i item at the center of the screen
                 var closeness = 1 - clamp(Math.abs(-x - i * ROW_WIDTH), 0, ROW_WIDTH * 4) / (ROW_WIDTH * 4);
 
-                if (i === 20 && false) {
-                    console.log(closeness);
-                    console.log(x);
-                    console.log(i);
-                    console.log("");
-                }
                 // Set the scale
                 return `scale(${closeness * 0.75})`;
             }),
