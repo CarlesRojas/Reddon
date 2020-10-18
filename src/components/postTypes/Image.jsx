@@ -4,7 +4,6 @@ export default function Image(props) {
     // Props
     const { images } = props;
 
-    // Image
     var image = null;
 
     // Make sure the image exists

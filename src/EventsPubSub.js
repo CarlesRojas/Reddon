@@ -42,4 +42,12 @@ export default class EventsPubSub {
         subreddit:      Subreddit where the post was clicked: "all", "homeSubreddit" or "subreddit"
         index:          Index of the post clicked
     },
+
+    {
+        event:          onIndexChange
+        desciption:     Called when the index changes
+        parameters:     {subreddit, index}
+        subreddit:      Subreddit where the index has changed: "all", "homeSubreddit" or "subreddit"
+        index:          New index
+    },
 */

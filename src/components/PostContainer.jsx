@@ -81,7 +81,7 @@ export default function PostContainer(props) {
         <div className="postContainer">
             <animated.div className="animatedPosition" style={{ ...animatedPositionStyle, ...transitionStyle }}>
                 <animated.div className="animatedScale" style={{ ...animatedScaleStyle, ...transitionStyle }} onClick={onPostClickHandle}>
-                    <Post postData={postData} zoomed={zoomed}></Post>
+                    <Post postData={postData} zoomed={zoomed} index={i} currSubreddit={subreddit}></Post>
                 </animated.div>
             </animated.div>
         </div>

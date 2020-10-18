@@ -58,6 +58,9 @@ export default function Posts(props) {
 
             // Load posts if needed
             if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();
+
+            // Inform about the index change
+            window.PubSub.emit("onIndexChange", { subreddit, index: index.current });
         }
 
         // Swap zoom scale and mode
@@ -75,12 +78,15 @@ export default function Posts(props) {
         // Load posts if needed
         if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();
 
+        // Inform about the index change
+        window.PubSub.emit("onIndexChange", { subreddit, index: index.current });
+
         // Swap zoom scale and mode
         zoomedRef.current = false;
         setZoomed(false);
     };
 
-    // Listen for the events
+    // Listen for events
     useEffect(() => {
         window.PubSub.sub("onZoomChange", zoomChangeHandle);
         window.PubSub.sub("onPostClicked", postClickedHandle);
@@ -120,6 +126,9 @@ export default function Posts(props) {
             // Load posts if needed
             if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();
 
+            // Inform about the index change
+            window.PubSub.emit("onIndexChange", { subreddit, index: index.current });
+
             // Prevent from going out of bounds
             const bounds = [-ROW_WIDTH * (posts.current.length - 1), 0];
             const bound = xDispl >= bounds[1] ? bounds[1] : xDispl <= bounds[0] ? bounds[0] : undefined;
@@ -156,6 +165,9 @@ export default function Posts(props) {
 
                     // Cancel the event
                     cancel((index.current = newIndex));
+
+                    // Inform about the index change
+                    window.PubSub.emit("onIndexChange", { subreddit, index: index.current });
 
                     // Load posts if needed
                     if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();

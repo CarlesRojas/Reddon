@@ -24,34 +24,26 @@ export default function NavPoints(props) {
     // Previous index
     const prevIndex = useRef(0);
 
+    // InertiaSpring
+    const [{ x, width }, setX] = useSpring(() => ({ x: 0, width: POINT_WIDTH, config: { duration: 200 } }));
+
     // Active point spring -> Left to right
-    const leftToRight = useSpring({
-        from: { width: POINT_WIDTH, x: prevIndex.current * POINT_WIDTH },
-        to: [{ width: POINT_WIDTH * 2 }, { x: index * POINT_WIDTH, width: POINT_WIDTH }],
-        config: { duration: 200 },
-    });
+    if (prevIndex.current < index) {
+        setX({ to: [{ width: POINT_WIDTH * 2 }, { x: index * POINT_WIDTH, width: POINT_WIDTH }] });
+    }
 
     // Active point spring -> Right to left
-    const rightToLeft = useSpring({
-        from: { width: POINT_WIDTH, x: prevIndex.current * POINT_WIDTH },
-        to: [{ width: POINT_WIDTH * 2, x: index * POINT_WIDTH }, { width: POINT_WIDTH }],
-        config: { duration: 200 },
-    });
+    else if (prevIndex.current > index) {
+        setX({ to: [{ width: POINT_WIDTH * 2, x: index * POINT_WIDTH }, { width: POINT_WIDTH }] });
+    }
 
-    // Set animation direction
-    if (prevIndex.current === index) var style = {};
-    else if (prevIndex.current < index) style = leftToRight;
-    else style = rightToLeft;
-
-    console.log(`Index ${index}    Prev: ${prevIndex.current}`);
-
-    // Set the index
+    // Update the index
     prevIndex.current = index;
 
     return (
         <div className="navPoints">
             <div className="navPointsContainer">
-                <animated.div className="activePointContainer" style={style}>
+                <animated.div className="activePointContainer" style={{ x, width }}>
                     <div className="activePoint"></div>
                 </animated.div>
                 {points}
