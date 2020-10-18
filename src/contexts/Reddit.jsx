@@ -141,7 +141,7 @@ const RedditProvider = (props) => {
     };
 
     // Retrieve the next posts of the specified subreddit
-    const getPosts = async (subreddit) => {
+    const getPosts = async (subreddit, limit = 50) => {
         var accessToken = await getAccessToken();
 
         // Set default parameters
@@ -149,12 +149,15 @@ const RedditProvider = (props) => {
 
         // Set the after parameter
         if (subreddit === "all" && allAfter.current) var after = `&after=${allAfter.current}`;
-        else if (subreddit === "home" && homeAfter.current) after = `&after=${homeAfter.current}`;
+        else if (subreddit === "homeSubreddit" && homeAfter.current) after = `&after=${homeAfter.current}`;
         else if (subreddit === subredditName.current && subredditAfter.current) after = `&after=${subredditAfter.current}`;
         else after = "";
 
+        // Home subreddit is an empty string
+        var fetchSubreddit = subreddit === "homeSubreddit" ? "" : `r/${subreddit}`;
+
         // Fetch
-        var rawResponse = await fetch(`https://oauth.reddit.com/r/${subreddit}.json?raw_json=1&limit=20${after}`, {
+        var rawResponse = await fetch(`https://oauth.reddit.com/${fetchSubreddit}?raw_json=1&limit=${limit}${after}`, {
             headers: {
                 Accept: "application/json, text/plain, */*",
                 Authorization: "bearer " + accessToken,
@@ -169,7 +172,7 @@ const RedditProvider = (props) => {
         }
 
         // Save posts to home
-        else if (subreddit === "home") {
+        else if (subreddit === "homeSubreddit") {
             setHomePosts([...homePosts, ...response.data.children]);
             homeAfter.current = response.data.after;
         }

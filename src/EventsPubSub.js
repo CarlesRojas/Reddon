@@ -32,14 +32,14 @@ export default class EventsPubSub {
         event:          onZoomChange
         desciption:     Called when the zoom should change
         parameters:     {subreddit}
-        subreddit:      Subreddit where the zoom should happen: "all", "home" or "subreddit"
+        subreddit:      Subreddit where the zoom should happen: "all", "homeSubreddit" or "subreddit"
     },
 
     {
         event:          onPostClicked
         desciption:     Called when a post is clicked while zoom is on
         parameters:     {subreddit, index}
-        subreddit:      Subreddit where the post was clicked: "all", "home" or "subreddit"
+        subreddit:      Subreddit where the post was clicked: "all", "homeSubreddit" or "subreddit"
         index:          Index of the post clicked
     }
 

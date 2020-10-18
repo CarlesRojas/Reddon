@@ -1,4 +1,4 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext, useRef, useEffect } from "react";
 import { useSpring, animated } from "react-spring";
 
 import Navbar from "components/Navbar";
@@ -26,20 +26,33 @@ export default function Home() {
         navSet({ x: currentSubreddit === "all" ? 0 : -rowWidth });
     }
 
+    // Component did mount
+    useEffect(() => {
+        // Get posts for "all"
+        getPosts("all", 3).then(() => {
+            getPosts("all");
+        });
+
+        // Get posts fror "homeSubreddit"
+        getPosts("homeSubreddit", 3).then(() => {
+            getPosts("homeSubreddit");
+        });
+    }, []);
+
     return (
         <div className="app">
             <Navbar></Navbar>
 
             <animated.div className="home" style={{ x }}>
                 <Posts subreddit="all" posts={allPosts}></Posts>
-                <Posts subreddit="home" posts={homePosts}></Posts>
+                <Posts subreddit="homeSubreddit" posts={homePosts}></Posts>
             </animated.div>
 
             <div className="deleteContainer">
                 <div className="delete" onClick={() => getPosts("all")}>
                     Load All
                 </div>
-                <div className="delete" onClick={() => getPosts("home")}>
+                <div className="delete" onClick={() => getPosts("homeSubreddit")}>
                     Load Home
                 </div>
                 <div className="delete" onClick={() => getPosts("funny")}>

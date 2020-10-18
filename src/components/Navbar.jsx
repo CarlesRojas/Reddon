@@ -33,7 +33,7 @@ export default function Navbar() {
                 <div className={"title" + (currentSubreddit === "all" ? " selected" : "")} onClick={() => swapPage("all")}>
                     all
                 </div>
-                <div className={"title" + (currentSubreddit === "home" ? " selected" : "")} onClick={() => swapPage("home")}>
+                <div className={"title" + (currentSubreddit === "homeSubreddit" ? " selected" : "")} onClick={() => swapPage("homeSubreddit")}>
                     home
                 </div>
             </div>
