@@ -389,12 +389,20 @@ button {
     box-sizing: border-box;
     width: 100%;
     height: 100%;
+    overflow-x: scroll;
     border-radius: $border-radius;
     display: flex;
     flex-direction: column;
     background: $foreground;
     padding: 8px;
     align-items: center;
+
+    -ms-overflow-style: none; /* Hide scrollbar IE and Edge */
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+
+    &::-webkit-scrollbar {
+        display: none; /* Hide scrollbar Chrome, Safari and Opera */
+    }
 
     .dark & {
         background: $foreground-dark;
@@ -427,13 +435,34 @@ button {
             font-weight: 500;
         }
     }
-    /*
-    background-image: url("https://images.pexels.com/photos/296878/pexels-photo-296878.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=500&w=500");
-    color: white;
-    text-shadow: 0px 0px 5px rgb(0, 0, 0);
-    font-size: 10rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    */
+
+    .selfText {
+        flex-grow: 1;
+        margin-top: 10px;
+
+        p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            list-style: none;
+            margin-left: 0;
+            padding-left: 0;
+
+            li {
+                font-size: 0.8rem;
+                opacity: 0.9;
+                margin-bottom: 10px;
+                padding-left: 1rem;
+                text-indent: -1rem;
+
+                &::before {
+                    content: "•";
+                    padding-right: 0.6rem;
+                }
+            }
+        }
+    }
 }
