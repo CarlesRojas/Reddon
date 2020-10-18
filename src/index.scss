@@ -16,7 +16,7 @@ $font-size: 18px;
 $line-height: 22px;
 $animation-speed: 0.2s;
 $navbar-height: 40px;
-$main-margin: 3px;
+$main-margin: 3px; // Also change in Images.jsx
 $border-radius: 10px;
 
 $orange: rgb(255, 69, 0);
@@ -32,6 +32,7 @@ $gradient: linear-gradient(45deg, rgb(255, 104, 104) 0%, rgb(255, 153, 39) 100%)
     -moz-box-shadow: 0px 0px $blur $spread rgba(0, 0, 0, $opacity);
     box-shadow: 0px 0px $blur $spread rgba(0, 0, 0, $opacity);
 }
+
 // #######################################
 //      MAIN ELEMENTS
 // #######################################
@@ -394,7 +395,7 @@ button {
     display: flex;
     flex-direction: column;
     background: $foreground;
-    padding: 8px;
+    padding: 8px 6px; // Also change in Images.jsx
     align-items: center;
 
     -ms-overflow-style: none; /* Hide scrollbar IE and Edge */
@@ -463,6 +464,30 @@ button {
                     padding-right: 0.6rem;
                 }
             }
+        }
+    }
+
+    .image {
+        position: relative;
+        width: 100%;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+
+    .images {
+        display: inline-block;
+        position: relative;
+        margin-top: 10px;
+        width: 100%;
+        height: fit-content;
+        clip-path: inset(0% 0% 0% 0%);
+        display: flex;
+        overflow: hidden;
+
+        .imageElem {
+            position: relative;
+            width: 100%;
+            border-radius: 10px;
         }
     }
 }
