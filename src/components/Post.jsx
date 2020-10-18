@@ -65,7 +65,7 @@ export default function Post(props) {
     //   PREVIEW MP4
     var video =
         preview && preview.reddit_video_preview ? (
-            <Player video={preview.reddit_video_preview} index={index} currSubreddit={currSubreddit}></Player>
+            <Video video={preview.reddit_video_preview} index={index} currSubreddit={currSubreddit}></Video>
         ) : null;
 
     //   IMAGE
@@ -81,7 +81,7 @@ export default function Post(props) {
     //   REDDIT VIDEO
     var redditVideo =
         preview && !preview.reddit_video_preview && media && media.reddit_video ? (
-            <Player video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Player>
+            <Video video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Video>
         ) : null;
 
     // Embeded video

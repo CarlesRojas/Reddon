@@ -4,7 +4,6 @@ export default function Video(props) {
     // Props
     const { video, index, currSubreddit } = props;
 
-    console.log(video);
     // State
     const videoRef = useRef(null);
 
