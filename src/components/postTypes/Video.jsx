@@ -4,6 +4,7 @@ export default function Video(props) {
     // Props
     const { video, index, currSubreddit } = props;
 
+    console.log(video);
     // State
     const videoRef = useRef(null);
 
@@ -32,12 +33,9 @@ export default function Video(props) {
         };
     }, []);
 
-    // Video
-    var videoElem = (
+    return (
         <video ref={videoRef} className="video" controls>
             <source src={video.fallback_url} type="video/mp4"></source>
         </video>
     );
-
-    return <React.Fragment>{videoElem}</React.Fragment>;
 }

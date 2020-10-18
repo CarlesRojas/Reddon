@@ -13,6 +13,7 @@ import Image from "components/postTypes/Image";
 import Video from "components/postTypes/Video";
 import Images from "components/postTypes/Images";
 import EmbededVideo from "components/postTypes/EmbededVideo";
+import Player from "components/postTypes/Player";
 
 export default function Post(props) {
     // Props
@@ -64,7 +65,7 @@ export default function Post(props) {
     //   PREVIEW MP4
     var video =
         preview && preview.reddit_video_preview ? (
-            <Video video={preview.reddit_video_preview} index={index} currSubreddit={currSubreddit}></Video>
+            <Player video={preview.reddit_video_preview} index={index} currSubreddit={currSubreddit}></Player>
         ) : null;
 
     //   IMAGE
@@ -80,12 +81,14 @@ export default function Post(props) {
     //   REDDIT VIDEO
     var redditVideo =
         preview && !preview.reddit_video_preview && media && media.reddit_video ? (
-            <Video video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Video>
+            <Player video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Player>
         ) : null;
 
     // Embeded video
     var embededVideo =
-        preview && !preview.reddit_video_preview && media && media.oembed ? <EmbededVideo embededVideo={media.oembed}></EmbededVideo> : null;
+        preview && !preview.reddit_video_preview && media && !media.reddit_video && media.oembed ? (
+            <EmbededVideo embededVideo={media.oembed}></EmbededVideo>
+        ) : null;
 
     return (
         <div className="post">
