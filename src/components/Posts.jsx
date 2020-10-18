@@ -95,7 +95,7 @@ export default function Posts(props) {
             window.PubSub.unsub("onZoomChange", zoomChangeHandle);
             window.PubSub.unsub("onPostClicked", postClickedHandle);
         };
-    });
+    }, []);
 
     // #################################################
     //   GESTURES WITH INERTIA

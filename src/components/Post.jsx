@@ -63,7 +63,7 @@ export default function Post(props) {
 
     //   PREVIEW MP4
     var video =
-        !media && !media_metadata && preview && preview.reddit_video_preview ? (
+        preview && preview.reddit_video_preview ? (
             <Video video={preview.reddit_video_preview} index={index} currSubreddit={currSubreddit}></Video>
         ) : null;
 
@@ -75,15 +75,17 @@ export default function Post(props) {
 
     //   IMAGES
     var images =
-        !media && media_metadata && Object.values(media_metadata).length ? (
-            <Images images={Object.values(media_metadata)} zoomed={zoomed}></Images>
+        media_metadata && Object.values(media_metadata).length ? <Images images={Object.values(media_metadata)} zoomed={zoomed}></Images> : null;
+
+    //   REDDIT VIDEO
+    var redditVideo =
+        preview && !preview.reddit_video_preview && media && media.reddit_video ? (
+            <Video video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Video>
         ) : null;
 
-    //   Reddit Vide
-    var redditVideo = media && media.reddit_video ? <Video video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Video> : null;
-
     // Embeded video
-    var embededVideo = media && media.oembed ? <EmbededVideo embededVideo={media.oembed}></EmbededVideo> : null;
+    var embededVideo =
+        preview && !preview.reddit_video_preview && media && media.oembed ? <EmbededVideo embededVideo={media.oembed}></EmbededVideo> : null;
 
     return (
         <div className="post">
