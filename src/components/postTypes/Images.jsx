@@ -5,12 +5,14 @@ import { useDrag } from "react-use-gesture";
 // Contexts
 import { Utils } from "contexts/Utils";
 
+import NavPoints from "components/NavPoints";
+
 // Constants
 const ROW_WIDTH = window.innerWidth - 6 - 12; // Total width - "postContainer" padding - "post" padding
 
 export default function Images(props) {
     // Props
-    const { images } = props;
+    const { images, zoomed } = props;
 
     // Contexts
     const { clamp } = useContext(Utils);
@@ -20,22 +22,22 @@ export default function Images(props) {
     // #################################################
 
     // Current gesture and position state
-    const [scrollLeft, setScrollLeft] = useState(0);
     const index = useRef(0);
+    const [currIndex, setCurrIndex] = useState(0);
     const gestureCancelled = useRef(false);
 
-    // Update the index when the inertia position changes
-    const onInertiaChangeHandle = (xDispl) => {
-        // Set the current scroll left
-        setScrollLeft(-xDispl);
-    };
-
     // InertiaSpring
-    const [{ x }, setX] = useSpring(() => ({ x: 0, onChange: onInertiaChangeHandle }));
+    const [{ x }, setX] = useSpring(() => ({ x: 0 }));
 
     // Scroll Gesture
     const gestureBind = useDrag(
-        ({ down, first, last, vxvy: [vx], movement: [mx], direction: [xDir], distance, cancel }) => {
+        ({ event, down, first, last, vxvy: [vx], movement: [mx], direction: [xDir], distance, cancel }) => {
+            // Don's use the gesture if it is zoomed
+            if (zoomed) return;
+
+            // Stop event propagation
+            event.stopPropagation();
+
             // Start the gesture -> Not cancelled
             if (first) gestureCancelled.current = false;
 
@@ -49,6 +51,9 @@ export default function Images(props) {
 
                 // Cancel the event
                 cancel((index.current = newIndex));
+
+                // Set the index
+                setCurrIndex(newIndex);
             }
 
             // Animation in progress -> Set the spring x value
@@ -60,10 +65,13 @@ export default function Images(props) {
     );
 
     return (
-        <div className="images" {...gestureBind()}>
-            {images.map(({ s }, i) => {
-                return <animated.img className="imageElem" key={i} src={s.u} alt="" style={{ x }}></animated.img>;
-            })}
-        </div>
+        <React.Fragment>
+            <div className="images" {...gestureBind()}>
+                {images.map(({ s }, i) => {
+                    return <animated.img className="imageElem" key={i} src={s.u} alt="" style={{ x }}></animated.img>;
+                })}
+            </div>
+            <NavPoints index={currIndex} length={images.length}></NavPoints>
+        </React.Fragment>
     );
 }

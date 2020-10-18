@@ -491,3 +491,49 @@ button {
         }
     }
 }
+
+.navPoints {
+    position: relative;
+    height: 20px;
+    width: 100%;
+
+    .navPointsContainer {
+        position: relative;
+        height: 100%;
+        width: fit-content;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: auto;
+
+        .activePointContainer {
+            position: absolute;
+            height: 100%;
+            left: 0;
+            width: 20px;
+
+            .activePoint {
+                margin: 7px;
+                height: 6px;
+                border-radius: 500px;
+                background-color: $text;
+
+                .dark & {
+                    background: $text-dark;
+                }
+            }
+        }
+
+        .point {
+            border-radius: 500px;
+            margin: 7px;
+            width: 6px;
+            height: 6px;
+            background-color: $background;
+
+            .dark & {
+                background: $background-dark;
+            }
+        }
+    }
+}

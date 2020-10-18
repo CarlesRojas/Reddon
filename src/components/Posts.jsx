@@ -167,7 +167,7 @@ export default function Posts(props) {
                 }
             }
         },
-        { initial: () => [zoomed ? x.get() : 0, 0], rubberband: true }
+        { initial: () => [zoomed ? x.get() : 0, 0], rubberband: true, filterTaps: true }
     );
 
     // #################################################

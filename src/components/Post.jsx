@@ -14,7 +14,7 @@ import Images from "components/postTypes/Images";
 
 export default function Post(props) {
     // Props
-    const { postData } = props;
+    const { postData, zoomed } = props;
 
     // Contexts
     const { unixTimeToDate, timeAgo } = useContext(Utils);
@@ -64,7 +64,10 @@ export default function Post(props) {
     var image = !media && !media_metadata && preview && preview.images && preview.images.length ? <Image images={preview.images}></Image> : null;
 
     //   IMAGES
-    var images = !media && media_metadata && Object.values(media_metadata).length ? <Images images={Object.values(media_metadata)}></Images> : null;
+    var images =
+        !media && media_metadata && Object.values(media_metadata).length ? (
+            <Images images={Object.values(media_metadata)} zoomed={zoomed}></Images>
+        ) : null;
 
     return (
         <div className="post">
