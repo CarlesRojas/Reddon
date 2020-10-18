@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 
 // Contexts
 import { Utils } from "contexts/Utils";
@@ -14,9 +14,6 @@ export default function Post(props) {
     // Contexts
     const { unixTimeToDate, timeAgo } = useContext(Utils);
     const { subredditsInfo } = useContext(Reddit);
-
-    // Update component
-    const [update, setUpdate] = useState(true);
 
     // Post data
     const { subreddit, subreddit_id, author, title, ups, created_utc, preview, media } = postData;

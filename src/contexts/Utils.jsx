@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import React, { useState, createContext } from "react";
 
 // Utils Context
 export const Utils = createContext();
@@ -86,8 +86,30 @@ const UtilsProvider = (props) => {
     const MONTH_NAMES_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
     // Get a formated string about how long ago the date was
-    function timeAgo(dateParam, shortDate = true) {
+    const timeAgo = (dateParam, shortDate = true) => {
         if (!dateParam) return null;
+
+        // Get the formatted date
+        const getFormattedDate = (date, shortDate = true, prefomattedDate = false, hideYear = false) => {
+            const day = date.getDate();
+            const month = MONTH_NAMES[date.getMonth()];
+            const monthShort = MONTH_NAMES_SHORT[date.getMonth()];
+            const year = date.getFullYear();
+            const hours = date.getHours();
+            let minutes = date.getMinutes();
+
+            // Adding leading zero to minutes
+            if (minutes < 10) minutes = `0${minutes}`;
+
+            // Today || Today at 10:20 || Yesterday || Yesterday at 10:20
+            if (prefomattedDate) return shortDate ? prefomattedDate : `${prefomattedDate} at ${hours}:${minutes}`;
+
+            // Jan 10 || 10 January at 10:20
+            if (hideYear) return shortDate ? `${monthShort} ${day}` : `${day} ${month} at ${hours}:${minutes}`;
+
+            // Jan 2017 || 10 January 2017 at 10:20
+            return shortDate ? `${monthShort} ${year}` : `${day} ${month} ${year} at ${hours}:${minutes}`;
+        };
 
         const date = typeof dateParam === "object" ? dateParam : new Date(dateParam);
         const DAY_IN_MS = 86400000; // 24 * 60 * 60 * 1000
@@ -108,29 +130,19 @@ const UtilsProvider = (props) => {
         else if (isYesterday) return getFormattedDate(date, shortDate, "Yesterday");
         else if (isThisYear) return getFormattedDate(date, shortDate, false, true);
         return getFormattedDate(date);
+    };
 
-        // Get the formatted date
-        function getFormattedDate(date, shortDate = true, prefomattedDate = false, hideYear = false) {
-            const day = date.getDate();
-            const month = MONTH_NAMES[date.getMonth()];
-            const monthShort = MONTH_NAMES_SHORT[date.getMonth()];
-            const year = date.getFullYear();
-            const hours = date.getHours();
-            let minutes = date.getMinutes();
+    // #######################################
+    //      HOOKS
+    // #######################################
 
-            // Adding leading zero to minutes
-            if (minutes < 10) minutes = `0${minutes}`;
-
-            // Today || Today at 10:20 || Yesterday || Yesterday at 10:20
-            if (prefomattedDate) return shortDate ? prefomattedDate : `${prefomattedDate} at ${hours}:${minutes}`;
-
-            // Jan 10 || 10 January at 10:20
-            if (hideYear) return shortDate ? `${monthShort} ${day}` : `${day} ${month} at ${hours}:${minutes}`;
-
-            // Jan 2017 || 10 January 2017 at 10:20
-            return shortDate ? `${monthShort} ${year}` : `${day} ${month} ${year} at ${hours}:${minutes}`;
-        }
-    }
+    //create your forceUpdate hook
+    const useForceUpdate = () => {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        const [value, setValue] = useState(0);
+        if (value < 0) console.log(value);
+        return () => setValue((value) => ++value);
+    };
 
     return (
         <Utils.Provider
@@ -150,6 +162,9 @@ const UtilsProvider = (props) => {
                 // DATE AND TIME
                 unixTimeToDate,
                 timeAgo,
+
+                // HOOKS
+                useForceUpdate,
             }}
         >
             {props.children}

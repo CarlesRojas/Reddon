@@ -41,6 +41,5 @@ export default class EventsPubSub {
         parameters:     {subreddit, index}
         subreddit:      Subreddit where the post was clicked: "all", "homeSubreddit" or "subreddit"
         index:          Index of the post clicked
-    }
-
+    },
 */

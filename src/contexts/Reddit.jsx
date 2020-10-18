@@ -194,8 +194,6 @@ const RedditProvider = (props) => {
                 subredditAfter.current = response.data.after;
             }
         }
-
-        console.log(response);
     };
 
     // Return the context

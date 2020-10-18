@@ -6,18 +6,39 @@ import PostContainer from "components/PostContainer";
 
 // Contexts
 import { Utils } from "contexts/Utils";
+import { Reddit } from "contexts/Reddit";
 
 // Constants
 const ROW_WIDTH = window.innerWidth;
 const BUFFER = 2;
 const PLACEHOLDERS = 0;
+const LOAD_MORE_BUFFER = 30;
 
 export default function Posts(props) {
     // Props
-    const { subreddit, posts } = props;
+    const { subreddit, posts, firstPostsLoaded } = props;
 
     // Contexts
     const { clamp } = useContext(Utils);
+    const { getPosts } = useContext(Reddit);
+
+    // #################################################
+    //   LOAD MORE POSTS
+    // #################################################
+
+    // True if posts for this subreddit are already getting loaded
+    const loadingPostsTimeout = useRef(false);
+
+    // Gets the next posts for this subreddit
+    const loadMorePosts = async () => {
+        // Return if we are already loading more posts
+        if (loadingPostsTimeout.current || !firstPostsLoaded.current) return;
+
+        // Start loading posts
+        loadingPostsTimeout.current = true;
+        await getPosts(subreddit, 50, true);
+        loadingPostsTimeout.current = false;
+    };
 
     // #################################################
     //   ZOOM CHANGE
@@ -34,6 +55,9 @@ export default function Posts(props) {
         if (zoomed) {
             index.current = clamp(Math.round(-x.get() / ROW_WIDTH), 0, posts.current.length - 1);
             setX({ x: index.current * -ROW_WIDTH, config: { decay: false, velocity: 0 } });
+
+            // Load posts if needed
+            if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();
         }
 
         // Swap zoom scale and mode
@@ -47,6 +71,9 @@ export default function Posts(props) {
         // Snap to current post
         index.current = postClickedIndex;
         setX({ x: index.current * -ROW_WIDTH, config: { decay: false, velocity: 0 } });
+
+        // Load posts if needed
+        if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();
 
         // Swap zoom scale and mode
         zoomedRef.current = false;
@@ -90,6 +117,9 @@ export default function Posts(props) {
             // Set the current index
             index.current = clamp(Math.round(-xDispl / ROW_WIDTH), 0, posts.current.length - 1);
 
+            // Load posts if needed
+            if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();
+
             // Prevent from going out of bounds
             const bounds = [-ROW_WIDTH * (posts.current.length - 1), 0];
             const bound = xDispl >= bounds[1] ? bounds[1] : xDispl <= bounds[0] ? bounds[0] : undefined;
@@ -126,6 +156,9 @@ export default function Posts(props) {
 
                     // Cancel the event
                     cancel((index.current = newIndex));
+
+                    // Load posts if needed
+                    if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();
                 }
 
                 // Animation in progress -> Set the spring x value

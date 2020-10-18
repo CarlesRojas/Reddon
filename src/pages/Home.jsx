@@ -1,30 +1,27 @@
-import React, { useState, useContext, useRef, useEffect } from "react";
+import React, { useContext, useRef, useEffect } from "react";
 import { useSpring, animated } from "react-spring";
 
 import Navbar from "components/Navbar";
 import Posts from "components/Posts";
 
 // Contexts
+import { Utils } from "contexts/Utils";
 import { Reddit } from "contexts/Reddit";
 
 // Size of the viewport
 const rowWidth = window.innerWidth;
 
-//create your forceUpdate hook
-function useForceUpdate() {
-    const [value, setValue] = useState(0); // integer state
-    return () => setValue((value) => ++value); // update the state to force render
-}
-
 export default function Home() {
     // Contexts
+    const { useForceUpdate } = useContext(Utils);
     const { currentSubreddit, getPosts, allPosts, homePosts } = useContext(Reddit);
 
-    // State
-    const subreddit = useRef("");
-    const forceUpdate = useForceUpdate();
+    // #################################################
+    //   NAVIGATION SPRING
+    // #################################################
 
     // Navigation spring
+    const subreddit = useRef("");
     const [{ x }, navSet] = useSpring(() => ({ x: 0 }));
 
     // If there is a change in subreddit -> Swap to that
@@ -32,6 +29,16 @@ export default function Home() {
         subreddit.current = currentSubreddit;
         navSet({ x: currentSubreddit === "all" ? 0 : -rowWidth });
     }
+
+    // #################################################
+    //   FETCH FIRST POSTS
+    // #################################################
+
+    // State
+    const firstPostsLoaded = useRef(false);
+
+    // Force update
+    const forceUpdate = useForceUpdate();
 
     // Component did mount
     useEffect(() => {
@@ -44,11 +51,11 @@ export default function Home() {
             // Get first posts for "homeSubreddit"
             getPosts("homeSubreddit", 8);
 
-            // Get more posts for "all"
-            getPosts("all", 50);
+            // Get more posts for "all" and "homeSubreddit"
+            await Promise.all([getPosts("all", 50), getPosts("homeSubreddit", 50)]);
 
-            // Get more posts for "homeSubreddit"
-            getPosts("homeSubreddit", 50);
+            // Inform that the first posts have been loaded
+            firstPostsLoaded.current = true;
         }
 
         // Load first posts
@@ -62,25 +69,13 @@ export default function Home() {
             <Navbar></Navbar>
 
             <animated.div className="home" style={{ x }}>
-                <Posts subreddit="all" posts={allPosts}></Posts>
-                <Posts subreddit="homeSubreddit" posts={homePosts}></Posts>
+                <Posts subreddit="all" posts={allPosts} firstPostsLoaded={firstPostsLoaded}></Posts>
+                <Posts subreddit="homeSubreddit" posts={homePosts} firstPostsLoaded={firstPostsLoaded}></Posts>
             </animated.div>
 
             <div className="deleteContainer">
-                <div className="delete" onClick={() => getPosts("all")}>
-                    Load All
-                </div>
-                <div className="delete" onClick={() => getPosts("homeSubreddit")}>
-                    Load Home
-                </div>
-                <div className="delete" onClick={() => getPosts("funny")}>
-                    Load funny
-                </div>
-                <div className="delete" onClick={() => getPosts("tifu")}>
-                    Load tifu
-                </div>
                 <div className="delete" onClick={() => window.PubSub.emit("onZoomChange", { subreddit: subreddit.current })}>
-                    M
+                    Zoom
                 </div>
             </div>
         </div>
