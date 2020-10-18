@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useEffect } from "react";
+import React, { useState, useContext, useRef, useEffect } from "react";
 import { useSpring, animated } from "react-spring";
 
 import Navbar from "components/Navbar";
@@ -10,12 +10,19 @@ import { Reddit } from "contexts/Reddit";
 // Size of the viewport
 const rowWidth = window.innerWidth;
 
+//create your forceUpdate hook
+function useForceUpdate() {
+    const [value, setValue] = useState(0); // integer state
+    return () => setValue((value) => ++value); // update the state to force render
+}
+
 export default function Home() {
     // Contexts
     const { currentSubreddit, getPosts, allPosts, homePosts } = useContext(Reddit);
 
     // State
     const subreddit = useRef("");
+    const forceUpdate = useForceUpdate();
 
     // Navigation spring
     const [{ x }, navSet] = useSpring(() => ({ x: 0 }));
@@ -28,15 +35,26 @@ export default function Home() {
 
     // Component did mount
     useEffect(() => {
-        // Get posts for "all"
-        getPosts("all", 3).then(() => {
-            getPosts("all");
-        });
+        // Load fewer posts to show them faster to the user
+        async function loadFirstPosts() {
+            // Get first posts for "all"
+            await getPosts("all", 8, true);
+            forceUpdate();
 
-        // Get posts fror "homeSubreddit"
-        getPosts("homeSubreddit", 3).then(() => {
-            getPosts("homeSubreddit");
-        });
+            // Get first posts for "homeSubreddit"
+            getPosts("homeSubreddit", 8);
+
+            // Get more posts for "all"
+            getPosts("all", 50);
+
+            // Get more posts for "homeSubreddit"
+            getPosts("homeSubreddit", 50);
+        }
+
+        // Load first posts
+        loadFirstPosts();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

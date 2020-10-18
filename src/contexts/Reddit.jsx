@@ -16,21 +16,20 @@ const RedditProvider = (props) => {
     const [currentSubreddit, setCurrentSubreddit] = useState("all");
 
     // All posts and next
-    const [allPosts, setAllPosts] = useState([]);
+    const allPosts = useRef([]);
     const allAfter = useRef("");
 
     // Home posts and next
-    const [homePosts, setHomePosts] = useState([]);
+    const homePosts = useRef([]);
     const homeAfter = useRef("");
 
     // Custom subreddit posts and next
     const subredditName = useRef("");
-    const [subredditPosts, setSubredditPosts] = useState([]);
+    const subredditPosts = useRef([]);
     const subredditAfter = useRef("");
 
     // Subreddit images and info
     const subredditsInfo = useRef({});
-    const [subredditsInfoLoaded, setSubredditsInfoLoaded] = useState(false);
 
     // Check and return access token
     const getAccessToken = async () => {
@@ -118,7 +117,8 @@ const RedditProvider = (props) => {
     // Fetch the info for the subreddits in the list
     const fetchSubredditsInfo = async (posts, accessToken) => {
         // Iterate the new posts
-        Promise.all(
+
+        await Promise.all(
             posts.map(async ({ data }) => {
                 // Fetch info if not present
                 if (!(data.subreddit_id in subredditsInfo.current)) {
@@ -135,13 +135,11 @@ const RedditProvider = (props) => {
                     subredditsInfo.current[data.subreddit_id] = response.data;
                 }
             })
-        ).then(() => {
-            setSubredditsInfoLoaded(!subredditsInfoLoaded);
-        });
+        );
     };
 
     // Retrieve the next posts of the specified subreddit
-    const getPosts = async (subreddit, limit = 50) => {
+    const getPosts = async (subreddit, limit = 50, awaitSubredditIcons = false) => {
         var accessToken = await getAccessToken();
 
         // Set default parameters
@@ -165,15 +163,19 @@ const RedditProvider = (props) => {
         });
         const response = await rawResponse.json();
 
+        // Get info for the subreddits
+        if (awaitSubredditIcons) await fetchSubredditsInfo(response.data.children, accessToken);
+        else fetchSubredditsInfo(response.data.children, accessToken);
+
         // Save posts to all
         if (subreddit === "all") {
-            setAllPosts([...allPosts, ...response.data.children]);
+            allPosts.current = [...allPosts.current, ...response.data.children];
             allAfter.current = response.data.after;
         }
 
         // Save posts to home
         else if (subreddit === "homeSubreddit") {
-            setHomePosts([...homePosts, ...response.data.children]);
+            homePosts.current = [...homePosts.current, ...response.data.children];
             homeAfter.current = response.data.after;
         }
 
@@ -181,20 +183,17 @@ const RedditProvider = (props) => {
         else {
             // If its the same subreddit -> Add posts to the list
             if (subredditName.current === subreddit) {
-                setSubredditPosts([...subredditPosts, ...response.data.children]);
+                subredditPosts.current = [...subredditPosts.current, ...response.data.children];
                 subredditAfter.current = response.data.after;
             }
 
             // New subreddit -> Clear list and add save the posts
             else {
                 subredditName.current = subreddit;
-                setSubredditPosts(response.data.children);
+                subredditPosts.current = response.data.children;
                 subredditAfter.current = response.data.after;
             }
         }
-
-        // Get info for the subreddits
-        fetchSubredditsInfo(response.data.children, accessToken);
 
         console.log(response);
     };
@@ -203,16 +202,15 @@ const RedditProvider = (props) => {
     return (
         <Reddit.Provider
             value={{
+                requestAccessToken,
+                refreshAccessToken,
                 currentSubreddit,
                 setCurrentSubreddit,
                 allPosts,
                 homePosts,
                 subredditPosts,
-                requestAccessToken,
-                refreshAccessToken,
                 getPosts,
                 subredditsInfo,
-                subredditsInfoLoaded,
             }}
         >
             {props.children}

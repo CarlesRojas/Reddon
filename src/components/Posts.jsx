@@ -32,7 +32,7 @@ export default function Posts(props) {
 
         // Snap to current post
         if (zoomed) {
-            index.current = clamp(Math.round(-x.get() / ROW_WIDTH), 0, postsLengthRef.current - 1);
+            index.current = clamp(Math.round(-x.get() / ROW_WIDTH), 0, posts.current.length - 1);
             setX({ x: index.current * -ROW_WIDTH, config: { decay: false, velocity: 0 } });
         }
 
@@ -75,17 +75,11 @@ export default function Posts(props) {
 
     // Refs that mirror the state
     const zoomedRef = useRef(zoomed);
-    const postsLengthRef = useRef(posts.length);
 
     // Update zoomed ref
     useEffect(() => {
         zoomedRef.current = zoomed;
     }, [zoomed]);
-
-    // Update postsLength ref
-    useEffect(() => {
-        postsLengthRef.current = posts.length;
-    }, [posts]);
 
     // Update the index when the inertia position changes
     const onInertiaChangeHandle = (xDispl) => {
@@ -94,10 +88,10 @@ export default function Posts(props) {
 
         if (zoomedRef.current) {
             // Set the current index
-            index.current = clamp(Math.round(-xDispl / ROW_WIDTH), 0, postsLengthRef.current - 1);
+            index.current = clamp(Math.round(-xDispl / ROW_WIDTH), 0, posts.current.length - 1);
 
             // Prevent from going out of bounds
-            const bounds = [-ROW_WIDTH * (postsLengthRef.current - 1), 0];
+            const bounds = [-ROW_WIDTH * (posts.current.length - 1), 0];
             const bound = xDispl >= bounds[1] ? bounds[1] : xDispl <= bounds[0] ? bounds[0] : undefined;
             if (bound !== undefined) setX({ x: bound, config: { decay: false, velocity: x.velocity } });
         }
@@ -128,7 +122,7 @@ export default function Posts(props) {
                     gestureCancelled.current = true;
 
                     // Get the new index
-                    const newIndex = clamp(index.current + (xDir > 0 ? -1 : 1), 0, Math.max(posts.length - 1, PLACEHOLDERS - 1));
+                    const newIndex = clamp(index.current + (xDir > 0 ? -1 : 1), 0, Math.max(posts.current.length - 1, PLACEHOLDERS - 1));
 
                     // Cancel the event
                     cancel((index.current = newIndex));
@@ -140,7 +134,7 @@ export default function Posts(props) {
                 }
             }
         },
-        { initial: () => [zoomed ? x.get() : 0, 0], rubberband: true, bounds: { left: -ROW_WIDTH * (posts.length - 1), right: 0 } }
+        { initial: () => [zoomed ? x.get() : 0, 0], rubberband: true }
     );
 
     // #################################################
@@ -148,7 +142,7 @@ export default function Posts(props) {
     // #################################################
 
     // Current state settings
-    const numColumns = posts.length > 0 ? posts.length : PLACEHOLDERS;
+    const numColumns = posts.current.length > 0 ? posts.current.length : PLACEHOLDERS;
     const startIndex = Math.max(0, Math.floor(scrollLeft / ROW_WIDTH) - BUFFER);
     const endIndex = Math.min(startIndex + BUFFER * 2, numColumns);
     const totalWidth = ROW_WIDTH * numColumns;
@@ -160,9 +154,16 @@ export default function Posts(props) {
 
     // Add all items that will be shown
     while (i < endIndex) {
-        if (i < posts.length)
+        if (i < posts.current.length)
             renderedItems.push(
-                <PostContainer key={posts[i].data.id} i={i} zoomed={zoomed} x={x} subreddit={subreddit} postData={posts[i].data}></PostContainer>
+                <PostContainer
+                    key={posts.current[i].data.id}
+                    i={i}
+                    zoomed={zoomed}
+                    x={x}
+                    subreddit={subreddit}
+                    postData={posts.current[i].data}
+                ></PostContainer>
             );
         else renderedItems.push(null);
         ++i;
