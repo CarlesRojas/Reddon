@@ -12,6 +12,7 @@ import Text from "components/postTypes/Text";
 import Image from "components/postTypes/Image";
 import Video from "components/postTypes/Video";
 import Images from "components/postTypes/Images";
+import EmbededVideo from "components/postTypes/EmbededVideo";
 
 export default function Post(props) {
     // Props
@@ -68,7 +69,7 @@ export default function Post(props) {
 
     //   IMAGE
     var image =
-        !media && !media_metadata && !preview.reddit_video_preview && preview && preview.images && preview.images.length ? (
+        !media && !media_metadata && preview && !preview.reddit_video_preview && preview.images && preview.images.length ? (
             <Image images={preview.images}></Image>
         ) : null;
 
@@ -81,6 +82,9 @@ export default function Post(props) {
     //   Reddit Vide
     var redditVideo = media && media.reddit_video ? <Video video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Video> : null;
 
+    // Embeded video
+    var embededVideo = media && media.oembed ? <EmbededVideo embededVideo={media.oembed}></EmbededVideo> : null;
+
     return (
         <div className="post">
             {subredditIcon}
@@ -90,6 +94,7 @@ export default function Post(props) {
             {images}
             {video}
             {redditVideo}
+            {embededVideo}
             {image}
             {text}
         </div>

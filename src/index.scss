@@ -16,7 +16,7 @@ $font-size: 18px;
 $line-height: 22px;
 $animation-speed: 0.2s;
 $navbar-height: 40px;
-$main-margin: 3px; // Also change in Images.jsx
+$main-margin: 3px; // Also change in Images.jsx and EmbededVide.jsx
 $border-radius: 10px;
 
 $orange: rgb(255, 69, 0);
@@ -395,7 +395,7 @@ button {
     display: flex;
     flex-direction: column;
     background: $foreground;
-    padding: 8px 6px; // Also change in Images.jsx
+    padding: 8px 6px; // Also change in Images.jsx and EmbededVide.jsx
     align-items: center;
 
     -ms-overflow-style: none; /* Hide scrollbar IE and Edge */
@@ -467,17 +467,12 @@ button {
         }
     }
 
+    .embededVideo,
+    .image,
     .video {
         position: relative;
         width: 100%;
-        border-radius: 10px;
-        margin-top: 10px;
-    }
-
-    .image {
-        position: relative;
-        width: 100%;
-        border-radius: 10px;
+        border-radius: $border-radius;
         margin-top: 10px;
     }
 
@@ -494,7 +489,7 @@ button {
         .imageElem {
             position: relative;
             width: 100%;
-            border-radius: 10px;
+            border-radius: $border-radius;
         }
     }
 }
@@ -522,7 +517,7 @@ button {
             .activePoint {
                 margin: 7px;
                 height: 6px;
-                border-radius: 500px;
+                border-radius: 50px;
                 background-color: $text;
 
                 .dark & {
@@ -532,7 +527,7 @@ button {
         }
 
         .point {
-            border-radius: 500px;
+            border-radius: 50px;
             margin: 7px;
             width: 6px;
             height: 6px;
@@ -543,4 +538,8 @@ button {
             }
         }
     }
+}
+
+iframe {
+    border-radius: $border-radius;
 }

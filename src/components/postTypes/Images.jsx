@@ -8,7 +8,7 @@ import { Utils } from "contexts/Utils";
 import NavPoints from "components/NavPoints";
 
 // Constants
-const ROW_WIDTH = window.innerWidth - 6 - 12; // Total width - "postContainer" padding - "post" padding
+const POST_WIDTH = window.innerWidth - 6 - 12; // Total width - "postContainer" padding - "post" padding
 
 export default function Images(props) {
     // Props
@@ -42,7 +42,7 @@ export default function Images(props) {
             if (first) gestureCancelled.current = false;
 
             // Cancel gesture and snap to next post
-            if (!gestureCancelled.current && ((down && distance > ROW_WIDTH * 0.4) || (last && Math.abs(vx) > 0.15))) {
+            if (!gestureCancelled.current && ((down && distance > POST_WIDTH * 0.4) || (last && Math.abs(vx) > 0.15))) {
                 // Cancel the gesture
                 gestureCancelled.current = true;
 
@@ -58,7 +58,7 @@ export default function Images(props) {
 
             // Animation in progress -> Set the spring x value
             else {
-                setX({ x: index.current * -ROW_WIDTH + (down ? mx : 0) });
+                setX({ x: index.current * -POST_WIDTH + (down ? mx : 0) });
             }
         },
         { rubberband: true }
