@@ -196,6 +196,21 @@ const RedditProvider = (props) => {
         }
     };
 
+    // Retrieve Reddit Video
+    const getRedditVideo = async (url) => {
+        var accessToken = await getAccessToken();
+        const proxyurl = "https://cors-anywhere.herokuapp.com/";
+
+        // Fetch
+        var rawResponse = await fetch(proxyurl + url, {
+            headers: {
+                Authorization: "bearer " + accessToken,
+            },
+        });
+        const response = await rawResponse.text();
+        console.log(response);
+    };
+
     // Return the context
     return (
         <Reddit.Provider
@@ -209,6 +224,7 @@ const RedditProvider = (props) => {
                 subredditPosts,
                 getPosts,
                 subredditsInfo,
+                getRedditVideo,
             }}
         >
             {props.children}

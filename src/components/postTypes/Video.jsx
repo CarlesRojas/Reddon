@@ -30,6 +30,8 @@ export default function Video(props) {
         return function cleanup() {
             window.PubSub.unsub("onIndexChange", indexChangeHandle);
         };
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (

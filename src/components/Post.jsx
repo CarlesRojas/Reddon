@@ -60,35 +60,47 @@ export default function Post(props) {
     // #################################################
 
     //   TEXT
-    var text = selftext_html ? <Text selfText={selftext_html}></Text> : null;
+    // #################################################
 
-    //   PREVIEW MP4
-    var video =
-        preview && preview.reddit_video_preview ? (
-            <Video video={preview.reddit_video_preview} index={index} currSubreddit={currSubreddit}></Video>
-        ) : null;
-
-    //   IMAGE
-    var image =
-        !media && !media_metadata && preview && !preview.reddit_video_preview && preview.images && preview.images.length ? (
-            <Image images={preview.images}></Image>
-        ) : null;
+    //   Text
+    const text = selftext_html ? <Text selfText={selftext_html}></Text> : null;
 
     //   IMAGES
-    var images =
+    // #################################################
+
+    // Image
+    const image = preview && preview.images && preview.images.length ? <Image images={preview.images}></Image> : null;
+
+    // Image gallery
+    const images =
         media_metadata && Object.values(media_metadata).length ? <Images images={Object.values(media_metadata)} zoomed={zoomed}></Images> : null;
 
-    //   REDDIT VIDEO
-    var redditVideo =
-        preview && !preview.reddit_video_preview && media && media.reddit_video ? (
-            <Video video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Video>
+    //   VIDEO
+    // #################################################
+
+    // Video Preview
+    const video =
+        preview && preview.reddit_video_preview ? (
+            <Player video={preview.reddit_video_preview} index={index} currSubreddit={currSubreddit}></Player>
         ) : null;
 
+    // Reddit video
+    const redditVideo = media && media.reddit_video ? <Player video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Player> : null;
+
     // Embeded video
-    var embededVideo =
-        preview && !preview.reddit_video_preview && media && !media.reddit_video && media.oembed ? (
-            <EmbededVideo embededVideo={media.oembed}></EmbededVideo>
-        ) : null;
+    const embededVideo = media && media.oembed ? <EmbededVideo embededVideo={media.oembed}></EmbededVideo> : null;
+
+    //   PRIORITIES
+    // #################################################
+
+    // Image to display
+    const finalImage = images ? images : image;
+
+    // Video to display
+    const finalVideo = video ? video : redditVideo ? redditVideo : embededVideo;
+
+    // Display only one media element
+    const finalMedia = finalVideo ? finalVideo : finalImage;
 
     return (
         <div className="post">
@@ -96,11 +108,7 @@ export default function Post(props) {
             <p className="subreddit">{subreddit}</p>
             <p className="author">{author + " · " + timeAgo(unixTimeToDate(created_utc), false)}</p>
             <p className="title">{title}</p>
-            {images}
-            {video}
-            {redditVideo}
-            {embededVideo}
-            {image}
+            {finalMedia}
             {text}
         </div>
     );

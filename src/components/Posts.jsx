@@ -95,6 +95,8 @@ export default function Posts(props) {
             window.PubSub.unsub("onZoomChange", zoomChangeHandle);
             window.PubSub.unsub("onPostClicked", postClickedHandle);
         };
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // #################################################
