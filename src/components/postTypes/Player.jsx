@@ -1,4 +1,4 @@
-import React, { useRef, useState, useContext } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import ReactPlayer from "react-player/lazy";
 
 // Contexts
@@ -15,28 +15,55 @@ export default function Player(props) {
     //   URLS
     // #################################################
 
-    // Get video url
-    const proxyurl = "https://cors-anywhere.herokuapp.com/";
+    // Url proxy to avoid cors in the server 😬
+    const proxyurl = "https://whispering-atoll-13206.herokuapp.com/";
     var url = video.dash_url ? proxyurl + video.dash_url : null;
 
-    //getRedditVideo(url);
-
-    /*
-    // Get audio url
-    var firstPart = url.substr(0, url.indexOf("DASH"));
-    var lastPart = url.substr(url.indexOf(".mp4"), url.length);
-    var audio_url = firstPart + "DASH_audio" + lastPart;
-    */
-
     // #################################################
-    //   LOGIC
+    //   AUTO PLAY/PAUSE
     // #################################################
+
+    // State
+    const [playback, setPlayback] = useState({ playing: index === 0 && currSubreddit === "all" });
+
+    // Handle a change in the index
+    const indexChangeHandle = ({ subreddit, index: newIndex }) => {
+        // Play video
+        if (subreddit === currSubreddit && index === newIndex) setPlayback({ ...playback, playing: true });
+        // Pause video
+        else setPlayback({ ...playback, playing: false });
+    };
+
+    // Listen for events
+    useEffect(() => {
+        window.PubSub.sub("onIndexChange", indexChangeHandle);
+
+        return function cleanup() {
+            window.PubSub.unsub("onIndexChange", indexChangeHandle);
+        };
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
-        <React.Fragment>
-            <div className="videoPlayer">
-                <ReactPlayer url={url} controls width="100%" height="100%" />
-            </div>
-        </React.Fragment>
+        <div className="videoPlayer">
+            <ReactPlayer
+                url={url}
+                controls
+                volume={0.2}
+                playing={playback.playing}
+                width="100%"
+                height="100%"
+                config={{
+                    file: {
+                        attributes: {
+                            autoPlay: false,
+                            controlsList: "nodownload noremoteplayback",
+                            disablePictureInPicture: true,
+                        },
+                    },
+                }}
+            />
+        </div>
     );
 }

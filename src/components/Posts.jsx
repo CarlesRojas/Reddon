@@ -10,7 +10,7 @@ import { Reddit } from "contexts/Reddit";
 
 // Constants
 const ROW_WIDTH = window.innerWidth;
-const BUFFER = 2;
+const BUFFER = 10;
 const PLACEHOLDERS = 0;
 const LOAD_MORE_BUFFER = 30;
 
@@ -52,7 +52,7 @@ export default function Posts(props) {
         if (subreddit !== zoomSubreddit) return;
 
         // Snap to current post
-        if (zoomed) {
+        if (zoomedRef.current) {
             index.current = clamp(Math.round(-x.get() / ROW_WIDTH), 0, posts.current.length - 1);
             setX({ x: index.current * -ROW_WIDTH, config: { decay: false, velocity: 0 } });
 
@@ -64,7 +64,7 @@ export default function Posts(props) {
         }
 
         // Swap zoom scale and mode
-        setZoomed(!zoomed);
+        setZoomed(!zoomedRef.current);
     };
 
     // Handles a click on a post while zoomed in
