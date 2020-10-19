@@ -10,7 +10,6 @@ import ReddonLogo from "resources/ReddonLogo.svg";
 // Post Types
 import Text from "components/postTypes/Text";
 import Image from "components/postTypes/Image";
-import Video from "components/postTypes/Video";
 import Images from "components/postTypes/Images";
 import EmbededVideo from "components/postTypes/EmbededVideo";
 import Player from "components/postTypes/Player";
@@ -32,15 +31,17 @@ export default function Post(props) {
         author,
         title,
         selftext_html,
-        score,
         created_utc,
         preview,
         media_metadata,
         media,
+        /*
+        score,
         over_18,
         hidden,
         likes,
         locked,
+        */
     } = postData;
 
     // #################################################

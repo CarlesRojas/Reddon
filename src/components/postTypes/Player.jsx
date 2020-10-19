@@ -1,15 +1,9 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import ReactPlayer from "react-player/lazy";
-
-// Contexts
-import { Reddit } from "contexts/Reddit";
 
 export default function Player(props) {
     // Props
     const { video, index, currSubreddit } = props;
-
-    // Contexts
-    const { getRedditVideo } = useContext(Reddit);
 
     // #################################################
     //   URLS
@@ -50,7 +44,7 @@ export default function Player(props) {
             <ReactPlayer
                 url={url}
                 controls
-                volume={0.2}
+                volume={0.1}
                 playing={playback.playing}
                 width="100%"
                 height="100%"
