@@ -1,8 +1,12 @@
 import React from "react";
+import SVG from "react-inlinesvg";
+
+// Icons
+import LinkIcon from "resources/Link.svg";
 
 export default function Image(props) {
     // Props
-    const { images } = props;
+    const { images, url, domain, post_hint } = props;
 
     if (process.env.REACT_APP_DEBUG === "true") console.log("Render Image");
 
@@ -14,5 +18,19 @@ export default function Image(props) {
         image = resolutions.length ? <img className="image" src={resolutions[resolutions.length - 1].url} alt=""></img> : null;
     }
 
-    return <React.Fragment>{image}</React.Fragment>;
+    // Make sure the link exists
+    var link =
+        post_hint === "link" && url && domain ? (
+            <a href={url} className="linkContainer">
+                <p>{domain}</p>
+                <SVG className="linkIcon" src={LinkIcon} />
+            </a>
+        ) : null;
+
+    return (
+        <React.Fragment>
+            {image}
+            {link}
+        </React.Fragment>
+    );
 }

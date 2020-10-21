@@ -7,7 +7,7 @@ import { Reddit } from "contexts/Reddit";
 // Icon
 import ReddonLogo from "resources/ReddonLogo.svg";
 
-// Post Types
+import UpvoteBar from "components/UpvoteBar";
 import Text from "components/postTypes/Text";
 import Image from "components/postTypes/Image";
 import Images from "components/postTypes/Images";
@@ -25,7 +25,9 @@ export default function Post(props) {
     if (process.env.REACT_APP_DEBUG === "true") console.log("Render Post");
 
     // Post data
+    //console.log(postData);
     const {
+        name,
         subreddit,
         subreddit_id,
         author,
@@ -36,11 +38,13 @@ export default function Post(props) {
         media_metadata,
         media,
         url,
-        /*
+        domain,
         score,
+        likes,
+        post_hint,
+        /*
         over_18,
         hidden,
-        likes,
         locked,
         */
     } = postData;
@@ -71,7 +75,10 @@ export default function Post(props) {
     // #################################################
 
     // Image
-    const image = preview && preview.images && preview.images.length ? <Image images={preview.images}></Image> : null;
+    const image =
+        preview && preview.images && preview.images.length ? (
+            <Image images={preview.images} url={url} domain={domain} post_hint={post_hint}></Image>
+        ) : null;
 
     // Image gallery
     const images =
@@ -107,14 +114,22 @@ export default function Post(props) {
     // Display only one media element
     const finalMedia = finalVideo ? finalVideo : finalImage;
 
+    // Class for centering the upvoteBar in Player videos
+    var correctMargin = finalVideo && !embededVideo ? "" : " true";
+
     return (
         <div className="post">
-            {subredditIcon}
-            <p className="subreddit">{subreddit}</p>
-            <p className="author">{author + " · " + timeAgo(unixTimeToDate(created_utc), false)}</p>
-            <p className="title">{title}</p>
-            {finalMedia}
-            {text}
+            <div className="mainContent">
+                {subredditIcon}
+                <p className="subreddit">{subreddit}</p>
+                <p className="author">{author + " · " + timeAgo(unixTimeToDate(created_utc), false)}</p>
+                <p className="title">{title}</p>
+                {finalMedia}
+                {text}
+                <div className={"correctMargin" + correctMargin}></div>
+                <UpvoteBar postID={name} score={score} likes={likes}></UpvoteBar>
+            </div>
+            <div className="comments"></div>
         </div>
     );
 }

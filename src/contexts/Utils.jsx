@@ -133,6 +133,48 @@ const UtilsProvider = (props) => {
     };
 
     // #######################################
+    //      NUMBER FORMAT
+    // #######################################
+
+    const fifteen_power = Math.pow(10, 15);
+    const twelve_power = Math.pow(10, 12);
+    const nine_power = Math.pow(10, 9);
+    const six_power = Math.pow(10, 6);
+    const three_power = Math.pow(10, 3);
+
+    function format_number(num) {
+        var negative = num < 0;
+        num = Math.abs(num);
+        var letter = "";
+
+        if (num >= fifteen_power) {
+            letter = "Q";
+            num = num / fifteen_power;
+        } else if (num >= twelve_power) {
+            letter = "T";
+            num = num / twelve_power;
+        } else if (num >= nine_power) {
+            letter = "B";
+            num = num / nine_power;
+        } else if (num >= six_power) {
+            letter = "M";
+            num = num / six_power;
+        } else if (num >= three_power) {
+            letter = "K";
+            num = num / three_power;
+        }
+
+        var num_characters = letter.length ? 3 : 4;
+
+        // Limit to one decimal and at most 4 characters
+        if (num >= 100) num = num.toFixed(Math.min(1, Math.max(0, num_characters - 3)));
+        else if (num >= 10) num = num.toFixed(Math.min(1, Math.max(0, num_characters - 2)));
+        else num = num.toFixed(Math.min(1, Math.max(0, num_characters - 1)));
+
+        return (+parseFloat(num) * (negative ? -1 : 1)).toString() + letter;
+    }
+
+    // #######################################
     //      HOOKS
     // #######################################
 
@@ -162,6 +204,9 @@ const UtilsProvider = (props) => {
                 // DATE AND TIME
                 unixTimeToDate,
                 timeAgo,
+
+                // FORMAT NUMBERS
+                format_number,
 
                 // HOOKS
                 useForceUpdate,

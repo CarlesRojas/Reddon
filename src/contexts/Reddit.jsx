@@ -152,7 +152,7 @@ const RedditProvider = (props) => {
         else after = "";
 
         // Home subreddit is an empty string
-        var fetchSubreddit = subreddit === "homeSubreddit" ? "" : `r/${subreddit}`;
+        var fetchSubreddit = subreddit === "homeSubreddit" ? "r/science" : `r/${subreddit}`;
 
         // Fetch
         var rawResponse = await fetch(`https://oauth.reddit.com/${fetchSubreddit}?raw_json=1&limit=${limit}${after}`, {
@@ -196,6 +196,26 @@ const RedditProvider = (props) => {
         }
     };
 
+    // Upvote
+    const vote = async (id, vote) => {
+        var accessToken = await getAccessToken();
+
+        // Post data
+        const POST_DATA = new FormData();
+        POST_DATA.append("id", id);
+        POST_DATA.append("dir", vote);
+
+        // Fetch
+        await fetch("https://oauth.reddit.com/api/vote", {
+            method: "post",
+            headers: {
+                Accept: "application/json, text/plain, */*",
+                Authorization: "bearer " + accessToken,
+            },
+            body: POST_DATA,
+        });
+    };
+
     // Return the context
     return (
         <Reddit.Provider
@@ -209,6 +229,7 @@ const RedditProvider = (props) => {
                 subredditPosts,
                 getPosts,
                 subredditsInfo,
+                vote,
             }}
         >
             {props.children}
