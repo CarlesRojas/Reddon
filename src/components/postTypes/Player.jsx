@@ -9,9 +9,16 @@ export default function Player(props) {
     //   URLS
     // #################################################
 
+    // Url directly
+    if (typeof video === "string" && video.includes("clips.twitch.tv")) {
+        var url = video;
+    }
+
     // Url proxy to avoid cors in the server 😬
-    const proxyurl = "https://whispering-atoll-13206.herokuapp.com/";
-    var url = video.dash_url ? proxyurl + video.dash_url : null;
+    else {
+        const proxyurl = "https://whispering-atoll-13206.herokuapp.com/";
+        var url = video.dash_url ? proxyurl + video.dash_url : null;
+    }
 
     // #################################################
     //   AUTO PLAY/PAUSE

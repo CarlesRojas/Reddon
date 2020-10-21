@@ -22,7 +22,7 @@ export default function Post(props) {
     const { unixTimeToDate, timeAgo } = useContext(Utils);
     const { subredditsInfo } = useContext(Reddit);
 
-    //console.log(postData);
+    console.log(postData);
 
     // Post data
     const {
@@ -35,6 +35,7 @@ export default function Post(props) {
         preview,
         media_metadata,
         media,
+        url,
         /*
         score,
         over_18,
@@ -88,6 +89,10 @@ export default function Post(props) {
     // Reddit video
     const redditVideo = media && media.reddit_video ? <Player video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Player> : null;
 
+    // Twitch video
+    console.log(url);
+    const twitchVideo = url && url.includes("clips.twitch.tv") ? <Player video={url} index={index} currSubreddit={currSubreddit}></Player> : null;
+
     // Embeded video
     const embededVideo = media && media.oembed ? <EmbededVideo embededVideo={media.oembed}></EmbededVideo> : null;
 
@@ -98,7 +103,7 @@ export default function Post(props) {
     const finalImage = images ? images : image;
 
     // Video to display
-    const finalVideo = video ? video : redditVideo ? redditVideo : embededVideo;
+    const finalVideo = twitchVideo ? twitchVideo : video ? video : redditVideo ? redditVideo : embededVideo;
 
     // Display only one media element
     const finalMedia = finalVideo ? finalVideo : finalImage;

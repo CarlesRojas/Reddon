@@ -152,7 +152,7 @@ const RedditProvider = (props) => {
         else after = "";
 
         // Home subreddit is an empty string
-        var fetchSubreddit = subreddit === "homeSubreddit" ? "" : `r/${subreddit}`;
+        var fetchSubreddit = subreddit === "homeSubreddit" ? "r/LivestreamFail" : `r/${subreddit}`;
 
         // Fetch
         var rawResponse = await fetch(`https://oauth.reddit.com/${fetchSubreddit}?raw_json=1&limit=${limit}${after}`, {

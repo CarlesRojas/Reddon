@@ -204,7 +204,7 @@ export default function Posts(props) {
         if (i < posts.current.length)
             renderedItems.push(
                 <PostContainer
-                    key={posts.current[i].data.id}
+                    key={subreddit + i + posts.current[i].data.id}
                     i={i}
                     zoomed={zoomed}
                     x={x}

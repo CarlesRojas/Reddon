@@ -469,16 +469,22 @@ button {
 
     .embededVideo,
     .image,
-    .video,
-    .videoPlayer {
+    .video {
         position: relative;
         width: 100%;
         border-radius: $border-radius;
         margin-top: 10px;
     }
 
-    .audioPlayer {
-        display: none;
+    .videoPlayer {
+        position: relative;
+        width: 100%;
+        margin-top: 15px;
+
+        video {
+            border-radius: $border-radius;
+            margin-top: -5px;
+        }
     }
 
     .images {
