@@ -11,6 +11,8 @@ export default function Navbar() {
     // Contexts
     const { currentSubreddit, setCurrentSubreddit } = useContext(Reddit);
 
+    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Navbar");
+
     // State
     const [pageSwapped, setPageSwapped] = useState(false);
 

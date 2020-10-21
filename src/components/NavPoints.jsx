@@ -7,6 +7,8 @@ export default function NavPoints(props) {
     // Props
     const { index, length } = props;
 
+    if (process.env.REACT_APP_DEBUG === "true") console.log("Render NavPoints");
+
     // #################################################
     //   STATIC POINTS
     // #################################################

@@ -16,6 +16,8 @@ export default function Home() {
     const { useForceUpdate } = useContext(Utils);
     const { currentSubreddit, getPosts, allPosts, homePosts } = useContext(Reddit);
 
+    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Home");
+
     // #################################################
     //   NAVIGATION SPRING
     // #################################################

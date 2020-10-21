@@ -16,6 +16,8 @@ export default function Landing(props) {
     const { requestAccessToken, refreshAccessToken } = useContext(Reddit);
     const { setCookie, getCookies, clearCookies } = useContext(Utils);
 
+    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Landing");
+
     // State
     const [accessGranted, setAccessGranted] = useState(false);
     const [cookies] = useState(getCookies());

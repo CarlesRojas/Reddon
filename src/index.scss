@@ -27,7 +27,7 @@ $gradient: linear-gradient(45deg, rgb(255, 104, 104) 0%, rgb(255, 153, 39) 100%)
 //      MIXINS
 // #######################################
 
-@mixin shadow($blur: 10px, $spread: 1px, $opacity: 0.2) {
+@mixin shadow($blur: 10px, $spread: 1px, $opacity: 0.1) {
     -webkit-box-shadow: 0px 0px $blur $spread rgba(0, 0, 0, $opacity);
     -moz-box-shadow: 0px 0px $blur $spread rgba(0, 0, 0, $opacity);
     box-shadow: 0px 0px $blur $spread rgba(0, 0, 0, $opacity);
@@ -474,6 +474,7 @@ button {
         width: 100%;
         border-radius: $border-radius;
         margin-top: 10px;
+        @include shadow();
     }
 
     .videoPlayer {
@@ -484,6 +485,7 @@ button {
         video {
             border-radius: $border-radius;
             margin-top: -5px;
+            @include shadow();
         }
     }
 
@@ -496,6 +498,7 @@ button {
         clip-path: inset(0% 0% 0% 0%);
         display: flex;
         overflow: hidden;
+        @include shadow();
 
         .imageElem {
             position: relative;

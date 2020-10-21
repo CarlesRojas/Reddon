@@ -1,9 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import ReactPlayer from "react-player/lazy";
+
+// Contexts
+import { Reddit } from "contexts/Reddit";
 
 export default function Player(props) {
     // Props
     const { video, index, currSubreddit } = props;
+
+    // Contexts
+    const { currentSubreddit } = useContext(Reddit);
+
+    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Player");
 
     // #################################################
     //   URLS
@@ -17,7 +25,7 @@ export default function Player(props) {
     // Url proxy to avoid cors in the server 😬
     else {
         const proxyurl = "https://whispering-atoll-13206.herokuapp.com/";
-        var url = video.dash_url ? proxyurl + video.dash_url : null;
+        url = video.dash_url ? proxyurl + video.dash_url : null;
     }
 
     // #################################################
@@ -28,12 +36,19 @@ export default function Player(props) {
     const [playback, setPlayback] = useState({ playing: index === 0 && currSubreddit === "all" });
 
     // Handle a change in the index
-    const indexChangeHandle = ({ subreddit, index: newIndex }) => {
+    const indexChangeHandle = ({ forcePause, subreddit, index: newIndex }) => {
         // Play video
-        if (subreddit === currSubreddit && index === newIndex) setPlayback({ ...playback, playing: true });
+        if (!forcePause && subreddit === currSubreddit && index === newIndex) setPlayback({ ...playback, playing: true });
         // Pause video
         else setPlayback({ ...playback, playing: false });
     };
+
+    // Pause video if we change subreddits
+    useEffect(() => {
+        if (currentSubreddit !== currSubreddit) setPlayback({ ...playback, playing: false });
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentSubreddit]);
 
     // Listen for events
     useEffect(() => {

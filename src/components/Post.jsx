@@ -22,7 +22,7 @@ export default function Post(props) {
     const { unixTimeToDate, timeAgo } = useContext(Utils);
     const { subredditsInfo } = useContext(Reddit);
 
-    console.log(postData);
+    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Post");
 
     // Post data
     const {
@@ -90,7 +90,6 @@ export default function Post(props) {
     const redditVideo = media && media.reddit_video ? <Player video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Player> : null;
 
     // Twitch video
-    console.log(url);
     const twitchVideo = url && url.includes("clips.twitch.tv") ? <Player video={url} index={index} currSubreddit={currSubreddit}></Player> : null;
 
     // Embeded video

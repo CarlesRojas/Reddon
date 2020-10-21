@@ -16,6 +16,8 @@ export default function PostContainer(props) {
     // Contexts
     const { clamp } = useContext(Utils);
 
+    if (process.env.REACT_APP_DEBUG === "true") console.log("Render PostContainer");
+
     // Animate the zoom in and out
     const isZoomed = useRef(zoomed);
     const animating = useRef(false);

@@ -14,6 +14,8 @@ export default function Images(props) {
     // Props
     const { images, zoomed } = props;
 
+    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Images");
+
     // Contexts
     const { clamp } = useContext(Utils);
 
