@@ -2,7 +2,7 @@ import React, { useState, useContext, useRef, useEffect } from "react";
 import { animated, useSpring } from "react-spring";
 import { useDrag } from "react-use-gesture";
 
-import PostContainer from "components/PostContainer";
+import Post from "./Post";
 
 // Contexts
 import { Utils } from "contexts/Utils";
@@ -48,6 +48,7 @@ export default function Posts(props) {
 
     // Zoom state
     const [zoomed, setZoomed] = useState(false);
+    const animating = useRef(false);
 
     // Handles a change in the zoom
     const zoomInOut = ({ subreddit: zoomSubreddit }) => {
@@ -70,9 +71,7 @@ export default function Posts(props) {
     };
 
     // Handles a click on a post while zoomed in
-    const postClickedHandle = ({ subreddit: postSubreddit, index: postClickedIndex }) => {
-        if (subreddit !== postSubreddit) return;
-
+    const postClickedHandle = (postClickedIndex) => {
         // Snap to current post
         index.current = postClickedIndex;
         setX({ x: index.current * -ROW_WIDTH, config: { decay: false, velocity: 0 } });
@@ -91,11 +90,9 @@ export default function Posts(props) {
     // Listen for events
     useEffect(() => {
         window.PubSub.sub("onZoomChange", zoomInOut);
-        window.PubSub.sub("onPostClicked", postClickedHandle);
 
         return function cleanup() {
             window.PubSub.unsub("onZoomChange", zoomInOut);
-            window.PubSub.unsub("onPostClicked", postClickedHandle);
         };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,11 +108,6 @@ export default function Posts(props) {
 
     // Refs that mirror the state
     const zoomedRef = useRef(zoomed);
-
-    // Update zoomed ref
-    useEffect(() => {
-        zoomedRef.current = zoomed;
-    }, [zoomed]);
 
     // Update the index when the inertia position changes
     const onInertiaChangeHandle = (xDispl) => {
@@ -183,6 +175,29 @@ export default function Posts(props) {
     );
 
     // #################################################
+    //   SPRING STYLES
+    // #################################################
+
+    // Style
+    var transitionStyle = {};
+
+    // Animate only when zoom changes
+    if (zoomedRef.current !== zoomed || animating.current) {
+        if (zoomedRef.current !== zoomed) zoomedRef.current = zoomed;
+        animating.current = true;
+
+        // Stop animating in 0.2s
+        setTimeout(() => {
+            animating.current = false;
+        }, 200);
+
+        // Apply the 0.2s transition
+        transitionStyle = {
+            transition: "transform 0.2s ease-in-out",
+        };
+    }
+
+    // #################################################
     //   BUFFER UPDATE
     // #################################################
 
@@ -195,23 +210,64 @@ export default function Posts(props) {
 
     // Elements to be rendered
     const renderedItems = [];
-    let i = startIndex;
 
     // Add all items that will be shown
-    while (i < endIndex) {
-        if (i < posts.current.length)
+    for (let i = startIndex; i < endIndex; i++) {
+        // Post inside limits
+        if (i < posts.current.length) {
+            // Post styles
+            var animatedScaleStyle = {};
+            var animatedPositionStyle = {};
+
+            // Get the style for the post
+            if (zoomed) {
+                // Scale spring
+                animatedScaleStyle = {
+                    transform: x.to((x) => {
+                        // When closeness is one, the i item at the center of the screen
+                        var closeness = 1 - clamp(Math.abs(-x - i * ROW_WIDTH), 0, ROW_WIDTH * 4) / (ROW_WIDTH * 4);
+
+                        // Set the scale
+                        return `scale(${closeness * 0.75})`;
+                    }),
+                };
+
+                // Position spring
+                animatedPositionStyle = {
+                    transform: x.to((x) => {
+                        // True if the post is on the left of the screen
+                        var onTheLeft = -x - i * ROW_WIDTH > 0;
+
+                        // When closeness is zero, the i item at the center of the screen
+                        var closeness = clamp(Math.abs(-x - i * ROW_WIDTH), 0, ROW_WIDTH * 3) / (ROW_WIDTH * 3);
+
+                        // Width displacement
+                        var widthDispl = closeness * ROW_WIDTH * (onTheLeft ? 1 : -1) * 0.8;
+
+                        // Set the scale
+                        return `translate(${widthDispl}px, 0px)`;
+                    }),
+                };
+            }
+
+            // Add a post to render
             renderedItems.push(
-                <PostContainer
-                    key={subreddit + i + posts.current[i].data.id}
-                    i={i}
-                    zoomed={zoomed}
-                    x={x}
-                    subreddit={subreddit}
-                    postData={posts.current[i].data}
-                ></PostContainer>
+                <div className="postContainer" key={subreddit + i + posts.current[i].data.id}>
+                    <animated.div className="animatedPosition" style={{ ...animatedPositionStyle, ...transitionStyle }}>
+                        <animated.div
+                            className="animatedScale"
+                            style={{ ...animatedScaleStyle, ...transitionStyle }}
+                            onClick={() => postClickedHandle(i)}
+                        >
+                            <Post postData={posts.current[i].data} zoomed={zoomed} index={i} currSubreddit={subreddit}></Post>
+                        </animated.div>
+                    </animated.div>
+                </div>
             );
+        }
+
+        // Push a null object
         else renderedItems.push(null);
-        ++i;
     }
 
     // #################################################

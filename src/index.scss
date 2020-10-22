@@ -356,33 +356,29 @@ button {
         height: 100%;
         display: flex;
         touch-action: none;
-    }
-}
 
-// #######################################
-//      POST CONTAINER
-// #######################################
-
-.postContainer {
-    position: relative;
-    box-sizing: border-box;
-    touch-action: none;
-    padding: $main-margin;
-    height: 100%;
-    width: 100vw;
-    pointer-events: none;
-
-    .animatedPosition {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-
-        .animatedScale {
+        .postContainer {
             position: relative;
-            width: 100%;
+            box-sizing: border-box;
+            touch-action: none;
+            padding: $main-margin;
             height: 100%;
-            pointer-events: all;
+            width: 100vw;
+            pointer-events: none;
+
+            .animatedPosition {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+
+                .animatedScale {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    pointer-events: all;
+                }
+            }
         }
     }
 }
