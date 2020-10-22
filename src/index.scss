@@ -270,11 +270,23 @@ button {
         padding: 10px;
         transform: rotate(0deg);
 
-        .cls-1 {
-            stroke: $icon !important;
+        &.active {
+            .cls-1,
+            .cls-2 {
+                stroke: $icon !important;
+
+                .dark & {
+                    stroke: $icon-dark !important;
+                }
+            }
+        }
+
+        .cls-1,
+        .cls-2 {
+            stroke: $icon-dimm !important;
 
             .dark & {
-                stroke: $icon-dark !important;
+                stroke: $icon-dimm-dark !important;
             }
         }
 
@@ -309,25 +321,6 @@ button {
     overflow: hidden;
     width: 200vw;
     display: flex;
-}
-
-.deleteContainer {
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: $main-margin;
-
-    .delete {
-        background-color: rgba(122, 122, 122, 0.397);
-        border-radius: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 5px 10px;
-        font-size: 0.6rem;
-        margin: 0 5px;
-    }
 }
 
 // #######################################
@@ -761,4 +754,9 @@ button {
 
 iframe {
     border-radius: $border-radius;
+}
+
+.cls-1,
+.cls-2 {
+    fill: none !important;
 }

@@ -64,6 +64,9 @@ export default function Posts(props) {
 
             // Inform about the index change
             window.PubSub.emit("onIndexChange", { subreddit, index: index.current });
+
+            // Inform about the zoom being disabled
+            window.PubSub.emit("onPostClicked");
         }
 
         // Swap zoom scale and mode

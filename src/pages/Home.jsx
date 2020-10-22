@@ -68,18 +68,12 @@ export default function Home() {
 
     return (
         <div className="app">
-            <Navbar></Navbar>
-
             <animated.div className="home" style={{ x }}>
                 <Posts subreddit="all" posts={allPosts} firstPostsLoaded={firstPostsLoaded}></Posts>
                 <Posts subreddit="homeSubreddit" posts={homePosts} firstPostsLoaded={firstPostsLoaded}></Posts>
             </animated.div>
 
-            <div className="deleteContainer">
-                <div className="delete" onClick={() => window.PubSub.emit("onZoomChange", { subreddit: subreddit.current })}>
-                    Zoom
-                </div>
-            </div>
+            <Navbar></Navbar>
         </div>
     );
 }
