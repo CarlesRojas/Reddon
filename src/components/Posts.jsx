@@ -50,7 +50,7 @@ export default function Posts(props) {
     const [zoomed, setZoomed] = useState(false);
 
     // Handles a change in the zoom
-    const zoomChangeHandle = ({ subreddit: zoomSubreddit }) => {
+    const zoomInOut = ({ subreddit: zoomSubreddit }) => {
         if (subreddit !== zoomSubreddit) return;
 
         // Snap to current post
@@ -90,11 +90,11 @@ export default function Posts(props) {
 
     // Listen for events
     useEffect(() => {
-        window.PubSub.sub("onZoomChange", zoomChangeHandle);
+        window.PubSub.sub("onZoomChange", zoomInOut);
         window.PubSub.sub("onPostClicked", postClickedHandle);
 
         return function cleanup() {
-            window.PubSub.unsub("onZoomChange", zoomChangeHandle);
+            window.PubSub.unsub("onZoomChange", zoomInOut);
             window.PubSub.unsub("onPostClicked", postClickedHandle);
         };
 
@@ -108,7 +108,6 @@ export default function Posts(props) {
     // Current gesture and position state
     const [scrollLeft, setScrollLeft] = useState(0);
     const index = useRef(0);
-    const gestureCancelled = useRef(false);
 
     // Refs that mirror the state
     const zoomedRef = useRef(zoomed);
@@ -145,7 +144,7 @@ export default function Posts(props) {
 
     // Scroll Gesture
     const gestureBind = useDrag(
-        ({ down, first, last, vxvy: [vx, vy], movement: [mx], direction: [xDir], distance, cancel }) => {
+        ({ down, first, last, vxvy: [vx, vy], movement: [mx], direction: [xDir], distance, cancel, canceled }) => {
             // If gesture is vertical -> Cancel event
             if (first && Math.abs(vy) >= Math.abs(vx)) cancel();
 
@@ -159,14 +158,8 @@ export default function Posts(props) {
 
             // Not Zoomed -> Move a post at a time
             else {
-                // Start the gesture -> Not cancelled
-                if (first) gestureCancelled.current = false;
-
                 // Cancel gesture and snap to next post
-                if (!gestureCancelled.current && ((down && distance > ROW_WIDTH * 0.4) || (last && Math.abs(vx) > 0.15))) {
-                    // Cancel the gesture
-                    gestureCancelled.current = true;
-
+                if (!canceled && ((down && distance > ROW_WIDTH * 0.4) || (last && Math.abs(vx) > 0.15))) {
                     // Get the new index
                     const newIndex = clamp(index.current + (xDir > 0 ? -1 : 1), 0, Math.max(posts.current.length - 1, PLACEHOLDERS - 1));
 
