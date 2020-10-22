@@ -4,7 +4,7 @@ import ReactPlayer from "react-player/lazy";
 // Contexts
 import { Reddit } from "contexts/Reddit";
 
-export default function Player(props) {
+export default function Video(props) {
     // Props
     const { video, index, currSubreddit } = props;
 

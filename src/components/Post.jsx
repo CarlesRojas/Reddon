@@ -12,7 +12,7 @@ import Text from "components/postTypes/Text";
 import Image from "components/postTypes/Image";
 import Images from "components/postTypes/Images";
 import EmbededVideo from "components/postTypes/EmbededVideo";
-import Player from "components/postTypes/Player";
+import Video from "components/postTypes/Video";
 
 export default function Post(props) {
     // Props
@@ -90,14 +90,14 @@ export default function Post(props) {
     // Video Preview
     const video =
         preview && preview.reddit_video_preview ? (
-            <Player video={preview.reddit_video_preview} index={index} currSubreddit={currSubreddit}></Player>
+            <Video video={preview.reddit_video_preview} index={index} currSubreddit={currSubreddit}></Video>
         ) : null;
 
     // Reddit video
-    const redditVideo = media && media.reddit_video ? <Player video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Player> : null;
+    const redditVideo = media && media.reddit_video ? <Video video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Video> : null;
 
     // Twitch video
-    const twitchVideo = url && url.includes("clips.twitch.tv") ? <Player video={url} index={index} currSubreddit={currSubreddit}></Player> : null;
+    const twitchVideo = url && url.includes("clips.twitch.tv") ? <Video video={url} index={index} currSubreddit={currSubreddit}></Video> : null;
 
     // Embeded video
     const embededVideo = media && media.oembed ? <EmbededVideo embededVideo={media.oembed}></EmbededVideo> : null;
@@ -114,7 +114,7 @@ export default function Post(props) {
     // Display only one media element
     const finalMedia = finalVideo ? finalVideo : finalImage;
 
-    // Class for centering the upvoteBar in Player videos
+    // Class for centering the upvoteBar in Videos
     var correctMargin = finalVideo && !embededVideo ? "" : " true";
 
     return (
