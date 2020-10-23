@@ -12,6 +12,7 @@ import { Reddit } from "contexts/Reddit";
 const BUFFER = 10;
 const PLACEHOLDERS = 0;
 const LOAD_MORE_BUFFER = 30;
+const ROW_WIDTH = window.innerWidth;
 
 export default function Posts(props) {
     // Props
@@ -20,9 +21,6 @@ export default function Posts(props) {
     // Contexts
     const { clamp } = useContext(Utils);
     const { getPosts } = useContext(Reddit);
-
-    // Width
-    const ROW_WIDTH = window.innerWidth;
 
     if (process.env.REACT_APP_DEBUG === "true") console.log("Render Posts");
 
