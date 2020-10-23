@@ -9,7 +9,6 @@ import { Utils } from "contexts/Utils";
 import { Reddit } from "contexts/Reddit";
 
 // Constants
-const ROW_WIDTH = window.innerWidth;
 const BUFFER = 10;
 const PLACEHOLDERS = 0;
 const LOAD_MORE_BUFFER = 30;
@@ -21,6 +20,9 @@ export default function Posts(props) {
     // Contexts
     const { clamp } = useContext(Utils);
     const { getPosts } = useContext(Reddit);
+
+    // Width
+    const ROW_WIDTH = window.innerWidth;
 
     if (process.env.REACT_APP_DEBUG === "true") console.log("Render Posts");
 
@@ -255,7 +257,7 @@ export default function Posts(props) {
 
             // Add a post to render
             renderedItems.push(
-                <div className="postContainer" key={subreddit + i + posts.current[i].data.id}>
+                <div className="postContainer" key={subreddit + i + posts.current[i].data.id} style={{ width: ROW_WIDTH }}>
                     <animated.div className="animatedPosition" style={{ ...animatedPositionStyle, ...transitionStyle }}>
                         <animated.div
                             className="animatedScale"
