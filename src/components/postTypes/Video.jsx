@@ -11,8 +11,6 @@ export default function Video(props) {
     // Contexts
     const { currentSubreddit } = useContext(Reddit);
 
-    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Player");
-
     // #################################################
     //   URLS
     // #################################################

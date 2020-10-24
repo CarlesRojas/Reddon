@@ -22,8 +22,6 @@ export default function Post(props) {
     const { unixTimeToDate, timeAgo } = useContext(Utils);
     const { subredditsInfo } = useContext(Reddit);
 
-    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Post");
-
     // Post data
     //console.log(postData);
     const {

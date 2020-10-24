@@ -8,8 +8,6 @@ export default function EmbededVideo(props) {
     // Props
     const { embededVideo } = props;
 
-    if (process.env.REACT_APP_DEBUG === "true") console.log("Render EmbededVideo");
-
     // Deconstruct
     const { html, height, width } = embededVideo;
 

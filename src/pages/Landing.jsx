@@ -13,10 +13,8 @@ import Logo from "resources/ReddonLogo.svg";
 
 export default function Landing(props) {
     // Contexts
-    const { requestAccessToken, refreshAccessToken } = useContext(Reddit);
+    const { redirectUri, clientID, requestAccessToken, refreshAccessToken } = useContext(Reddit);
     const { setCookie, getCookies, clearCookies } = useContext(Utils);
-
-    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Landing");
 
     // State
     const [accessGranted, setAccessGranted] = useState(false);
@@ -83,10 +81,8 @@ export default function Landing(props) {
             console.log("First Time -> Log in with Reddit");
 
             // Create Oauth request link
-            const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
-            const REACT_APP_CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
             const RANDOM_STRING = randomstring.generate(50);
-            const link = `https://www.reddit.com/api/v1/authorize.compact?client_id=${REACT_APP_CLIENT_ID}&response_type=code&state=${RANDOM_STRING}&redirect_uri=${REDIRECT_URI}&duration=permanent&scope=vote read`;
+            const link = `https://www.reddit.com/api/v1/authorize.compact?client_id=${clientID}&response_type=code&state=${RANDOM_STRING}&redirect_uri=${redirectUri}&duration=permanent&scope=vote read`;
 
             // Save state random string
             setCookie("reddon_state", RANDOM_STRING);

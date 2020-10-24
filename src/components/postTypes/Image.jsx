@@ -8,8 +8,6 @@ export default function Image(props) {
     // Props
     const { images, url, domain, post_hint } = props;
 
-    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Image");
-
     var image = null;
 
     // Make sure the image exists

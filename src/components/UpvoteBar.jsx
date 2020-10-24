@@ -17,8 +17,6 @@ export default function UpvoteBar(props) {
     const { format_number } = useContext(Utils);
     const { vote } = useContext(Reddit);
 
-    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Upote Bar");
-
     // #################################################
     //   UP & DOWN VOTE
     // #################################################

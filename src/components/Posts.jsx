@@ -22,8 +22,6 @@ export default function Posts(props) {
     const { clamp } = useContext(Utils);
     const { getPosts } = useContext(Reddit);
 
-    if (process.env.REACT_APP_DEBUG === "true") console.log("Render Posts");
-
     // #################################################
     //   LOAD MORE POSTS
     // #################################################

@@ -9,6 +9,10 @@ const RedditProvider = (props) => {
     // Context
     const { setCookie, getCookie } = useContext(Utils);
 
+    // Redirect uri & Client ID
+    const redirectUri = "https://reddon.netlify.app"; // http://localhost:3000
+    const clientID = "y7VNHo_M9CHwlA";
+
     // Refresh token timeout
     const refreshTimeout = useRef(null);
 
@@ -64,7 +68,7 @@ const RedditProvider = (props) => {
             method: "post",
             headers: {
                 Accept: "application/json, text/plain, */*",
-                Authorization: `Basic ${btoa(unescape(encodeURIComponent(`${process.env.REACT_APP_CLIENT_ID}:`)))}`,
+                Authorization: `Basic ${btoa(unescape(encodeURIComponent(`${clientID}:`)))}`,
             },
             body: POST_DATA,
         });
@@ -88,14 +92,14 @@ const RedditProvider = (props) => {
         const POST_DATA = new FormData();
         POST_DATA.append("code", code);
         POST_DATA.append("grant_type", "authorization_code");
-        POST_DATA.append("redirect_uri", process.env.REACT_APP_REDIRECT_URI);
+        POST_DATA.append("redirect_uri", redirectUri);
 
         // Fetch
         var rawResponse = await fetch("https://www.reddit.com/api/v1/access_token", {
             method: "post",
             headers: {
                 Accept: "application/json, text/plain, */*",
-                Authorization: `Basic ${btoa(unescape(encodeURIComponent(`${process.env.REACT_APP_CLIENT_ID}:`)))}`,
+                Authorization: `Basic ${btoa(unescape(encodeURIComponent(`${clientID}:`)))}`,
             },
             body: POST_DATA,
         });
@@ -220,6 +224,8 @@ const RedditProvider = (props) => {
     return (
         <Reddit.Provider
             value={{
+                redirectUri,
+                clientID,
                 requestAccessToken,
                 refreshAccessToken,
                 currentSubreddit,
