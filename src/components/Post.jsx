@@ -16,11 +16,11 @@ import Video from "components/postTypes/Video";
 
 export default function Post(props) {
     // Props
-    const { postData, zoomed, index, currSubreddit } = props;
+    const { postData, index, currSubreddit } = props;
 
     // Contexts
     const { unixTimeToDate, timeAgo } = useContext(Utils);
-    const { subredditsInfo } = useContext(Reddit);
+    const { zooms, subredditsInfo } = useContext(Reddit);
 
     // Post data
     //console.log(postData);
@@ -80,7 +80,9 @@ export default function Post(props) {
 
     // Image gallery
     const images =
-        media_metadata && Object.values(media_metadata).length ? <Images images={Object.values(media_metadata)} zoomed={zoomed}></Images> : null;
+        media_metadata && Object.values(media_metadata).length ? (
+            <Images images={Object.values(media_metadata)} zoomed={zooms[currSubreddit]}></Images>
+        ) : null;
 
     //   VIDEO
     // #################################################

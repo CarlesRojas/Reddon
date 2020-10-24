@@ -372,6 +372,51 @@ button {
                 }
             }
         }
+
+        .loading {
+            position: absolute;
+            background: $gradient;
+            width: 50px;
+            height: 50px;
+            min-width: 50px;
+            max-width: 50px;
+            margin: calc(50% - 30px);
+            border-radius: 100px;
+            padding: 5px;
+
+            .icon {
+                box-sizing: border-box;
+                width: 50px;
+                height: 50px;
+                min-width: 50px;
+                max-width: 50px;
+                padding: 10px;
+                transform: rotate(0deg);
+
+                .cls-1,
+                .cls-2 {
+                    stroke: $background !important;
+
+                    .dark & {
+                        stroke: $background-dark !important;
+                    }
+                }
+
+                &.spin {
+                    animation: spin $animation-speed * 10 infinite;
+                    animation-fill-mode: forwards;
+
+                    @keyframes spin {
+                        0% {
+                            transform: rotate(0deg);
+                        }
+                        100% {
+                            transform: rotate(359deg);
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

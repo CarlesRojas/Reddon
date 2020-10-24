@@ -10,11 +10,10 @@ import RecentIcon from "resources/Recent.svg";
 
 export default function Navbar() {
     // Contexts
-    const { currentSubreddit, setCurrentSubreddit } = useContext(Reddit);
+    const { zooms, setZooms, currentSubreddit, setCurrentSubreddit } = useContext(Reddit);
 
     // State
     const [pageSwapped, setPageSwapped] = useState(false);
-    const [zoomed, setZoomed] = useState(false);
 
     // Swap page
     const swapPage = (page) => {
@@ -29,10 +28,9 @@ export default function Navbar() {
 
     // Handle zoom click
     const onZoomClicked = () => {
-        setZoomed(!zoomed);
-
-        // Inform about a zoom change
-        window.PubSub.emit("onZoomChange", { subreddit: currentSubreddit });
+        if (currentSubreddit === "all") setZooms({ ...zooms, all: !zooms.all });
+        else if (currentSubreddit === "homeSubreddit") setZooms({ ...zooms, homeSubreddit: !zooms.homeSubreddit });
+        else setZooms({ ...zooms, subreddit: !zooms.subreddit });
     };
 
     return (
@@ -47,7 +45,7 @@ export default function Navbar() {
                     home
                 </div>
             </div>
-            <SVG className={"icon" + (zoomed ? " active" : "")} src={RecentIcon} onClick={onZoomClicked} />
+            <SVG className={"icon" + (zooms[currentSubreddit] ? " active" : "")} src={RecentIcon} onClick={onZoomClicked} />
         </div>
     );
 }

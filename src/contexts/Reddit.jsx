@@ -32,6 +32,9 @@ const RedditProvider = (props) => {
     const subredditPosts = useRef([]);
     const subredditAfter = useRef("");
 
+    // Subredit zooms
+    const [zooms, setZooms] = useState({ all: false, homeSubreddit: false, subreddit: false });
+
     // Subreddit images and info
     const subredditsInfo = useRef({});
 
@@ -156,7 +159,7 @@ const RedditProvider = (props) => {
         else after = "";
 
         // Home subreddit is an empty string
-        var fetchSubreddit = subreddit === "homeSubreddit" ? "r/science" : `r/${subreddit}`;
+        var fetchSubreddit = subreddit === "homeSubreddit" ? "" : `r/${subreddit}`;
 
         // Fetch
         var rawResponse = await fetch(`https://oauth.reddit.com/${fetchSubreddit}?raw_json=1&limit=${limit}${after}`, {
@@ -224,15 +227,28 @@ const RedditProvider = (props) => {
     return (
         <Reddit.Provider
             value={{
+                // App main info
                 redirectUri,
                 clientID,
+
+                // Authentification
                 requestAccessToken,
                 refreshAccessToken,
+
+                // Current Subreddit
                 currentSubreddit,
                 setCurrentSubreddit,
+
+                // Subreddit posts
                 allPosts,
                 homePosts,
                 subredditPosts,
+
+                // Subreddit Zoom
+                zooms,
+                setZooms,
+
+                // Reddit API
                 getPosts,
                 subredditsInfo,
                 vote,

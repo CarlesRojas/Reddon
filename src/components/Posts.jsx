@@ -1,12 +1,16 @@
 import React, { useState, useContext, useRef, useEffect } from "react";
 import { animated, useSpring } from "react-spring";
 import { useDrag } from "react-use-gesture";
+import SVG from "react-inlinesvg";
 
 import Post from "./Post";
 
 // Contexts
 import { Utils } from "contexts/Utils";
 import { Reddit } from "contexts/Reddit";
+
+// Icons
+import RefreshIcon from "resources/Refresh.svg";
 
 // Constants
 const BUFFER = 10;
@@ -20,7 +24,7 @@ export default function Posts(props) {
 
     // Contexts
     const { clamp } = useContext(Utils);
-    const { getPosts } = useContext(Reddit);
+    const { zooms, setZooms, getPosts } = useContext(Reddit);
 
     // #################################################
     //   LOAD MORE POSTS
@@ -45,16 +49,12 @@ export default function Posts(props) {
     // #################################################
 
     // Zoom state
-    const [zoomed, setZoomed] = useState(false);
     const animating = useRef(false);
 
     // Handles a change in the zoom
-    const zoomInOut = ({ subreddit: zoomSubreddit }) => {
-        if (subreddit !== zoomSubreddit) return;
-
+    useEffect(() => {
         // Snap to current post
-        if (zoomedRef.current) {
-            index.current = clamp(Math.round(-x.get() / ROW_WIDTH), 0, posts.current.length - 1);
+        if (!zooms[subreddit]) {
             setX({ x: index.current * -ROW_WIDTH, config: { decay: false, velocity: 0 } });
 
             // Load posts if needed
@@ -62,14 +62,10 @@ export default function Posts(props) {
 
             // Inform about the index change
             window.PubSub.emit("onIndexChange", { subreddit, index: index.current });
-
-            // Inform about the zoom being disabled
-            window.PubSub.emit("onPostClicked");
         }
 
-        // Swap zoom scale and mode
-        setZoomed(!zoomedRef.current);
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [zooms[subreddit]]);
 
     // Handles a click on a post while zoomed in
     const postClickedHandle = (postClickedIndex) => {
@@ -85,19 +81,12 @@ export default function Posts(props) {
 
         // Swap zoom scale and mode
         zoomedRef.current = false;
-        setZoomed(false);
+
+        // Swap zoom scale and mode
+        if (subreddit === "all") setZooms({ ...zooms, all: false });
+        else if (subreddit === "homeSubreddit") setZooms({ ...zooms, homeSubreddit: false });
+        else setZooms({ ...zooms, subreddit: false });
     };
-
-    // Listen for events
-    useEffect(() => {
-        window.PubSub.sub("onZoomChange", zoomInOut);
-
-        return function cleanup() {
-            window.PubSub.unsub("onZoomChange", zoomInOut);
-        };
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     // #################################################
     //   GESTURES WITH INERTIA
@@ -108,7 +97,7 @@ export default function Posts(props) {
     const index = useRef(0);
 
     // Refs that mirror the state
-    const zoomedRef = useRef(zoomed);
+    const zoomedRef = useRef(zooms[subreddit]);
 
     // Update the index when the inertia position changes
     const onInertiaChangeHandle = (xDispl) => {
@@ -142,7 +131,7 @@ export default function Posts(props) {
             if (first && Math.abs(vy) >= Math.abs(vx)) cancel();
 
             // Zoomed -> Move with inertia
-            if (zoomed) {
+            if (zooms[subreddit]) {
                 // While gesture is active -> Move without inertia
                 if (down) setX({ x: mx, config: { decay: false, velocity: 0 } });
                 // When the gesture ends -> Apply inertia
@@ -172,7 +161,7 @@ export default function Posts(props) {
                 }
             }
         },
-        { initial: () => [zoomed ? x.get() : 0, 0], rubberband: true, filterTaps: true }
+        { initial: () => [zooms[subreddit] ? x.get() : 0, 0], rubberband: true, filterTaps: true }
     );
 
     // #################################################
@@ -183,8 +172,8 @@ export default function Posts(props) {
     var transitionStyle = {};
 
     // Animate only when zoom changes
-    if (zoomedRef.current !== zoomed || animating.current) {
-        if (zoomedRef.current !== zoomed) zoomedRef.current = zoomed;
+    if (zoomedRef.current !== zooms[subreddit] || animating.current) {
+        if (zoomedRef.current !== zooms[subreddit]) zoomedRef.current = zooms[subreddit];
         animating.current = true;
 
         // Stop animating in 0.2s
@@ -221,7 +210,7 @@ export default function Posts(props) {
             var animatedPositionStyle = {};
 
             // Get the style for the post
-            if (zoomed) {
+            if (zooms[subreddit]) {
                 // Scale spring
                 animatedScaleStyle = {
                     transform: x.to((x) => {
@@ -260,7 +249,7 @@ export default function Posts(props) {
                             style={{ ...animatedScaleStyle, ...transitionStyle }}
                             onClick={() => postClickedHandle(i)}
                         >
-                            <Post postData={posts.current[i].data} zoomed={zoomed} index={i} currSubreddit={subreddit}></Post>
+                            <Post postData={posts.current[i].data} index={i} currSubreddit={subreddit}></Post>
                         </animated.div>
                     </animated.div>
                 </div>
@@ -282,10 +271,20 @@ export default function Posts(props) {
         x,
     };
 
+    // Loading
+    console.log(renderedItems);
+    var loading = !renderedItems.length ? (
+        <div className="loading">
+            <SVG className="icon spin" src={RefreshIcon} />
+        </div>
+    ) : null;
+    console.log(loading);
+
     return (
         <div className={"posts" + (subreddit === "all" ? "" : " right")}>
             <animated.div className="container" {...gestureBind()} style={containerStyle}>
                 {renderedItems}
+                {loading}
             </animated.div>
         </div>
     );

@@ -44,12 +44,11 @@ export default function Home() {
     useEffect(() => {
         // Load fewer posts to show them faster to the user
         async function loadFirstPosts() {
-            // Get first posts for "all"
-            await getPosts("all", 8, true);
-            forceUpdate();
+            // Get first posts for "all" and "homeSubreddit"
+            await Promise.all([getPosts("all", 8, true), getPosts("homeSubreddit", 8)]);
 
-            // Get first posts for "homeSubreddit"
-            getPosts("homeSubreddit", 8);
+            // Force update
+            forceUpdate();
 
             // Get more posts for "all" and "homeSubreddit"
             await Promise.all([getPosts("all", 50), getPosts("homeSubreddit", 50)]);
