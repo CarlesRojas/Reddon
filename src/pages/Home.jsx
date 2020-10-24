@@ -3,13 +3,15 @@ import { useSpring, animated } from "react-spring";
 
 import Navbar from "components/Navbar";
 import Posts from "components/Posts";
+import SubredditPopup from "components/SubredditPopup";
 
 // Contexts
 import { Utils } from "contexts/Utils";
 import { Reddit } from "contexts/Reddit";
 
 // Size of the viewport
-const rowWidth = window.innerWidth;
+const SCREEN_WIDTH = window.innerWidth;
+const SCREEN_HEIGHT = window.innerHeight;
 
 export default function Home() {
     // Contexts
@@ -17,17 +19,25 @@ export default function Home() {
     const { currentSubreddit, getPosts, allPosts, homePosts } = useContext(Reddit);
 
     // #################################################
-    //   NAVIGATION SPRING
+    //   NAVIGATION SPRINGS
     // #################################################
 
-    // Navigation spring
+    // Horizontal avigation spring
     const subreddit = useRef("");
-    const [{ x }, navSet] = useSpring(() => ({ x: 0 }));
+    const [{ x }, horizontalNavigationSet] = useSpring(() => ({ x: 0 }));
+    const [{ y }, verticalNavigationSet] = useSpring(() => ({ y: 0 }));
 
     // If there is a change in subreddit -> Swap to that
     if (currentSubreddit !== subreddit.current) {
         subreddit.current = currentSubreddit;
-        navSet({ x: currentSubreddit === "all" ? 0 : -rowWidth });
+
+        // If the subreddit is "all" or "homeSubreddit" -> Move to that subreddit
+        if (currentSubreddit === "all" || currentSubreddit === "homeSubreddit") {
+            horizontalNavigationSet({ x: currentSubreddit === "all" ? 0 : -SCREEN_WIDTH });
+            verticalNavigationSet({ y: 0 });
+        }
+        // Otherwise, show the other subreddit
+        else verticalNavigationSet({ y: SCREEN_HEIGHT });
     }
 
     // #################################################
@@ -71,6 +81,10 @@ export default function Home() {
             </animated.div>
 
             <Navbar></Navbar>
+
+            <animated.div className="subredditPopupContainer" style={{ y, width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}>
+                <SubredditPopup open={currentSubreddit !== "all" && currentSubreddit !== "homeSubreddit"}></SubredditPopup>
+            </animated.div>
         </div>
     );
 }

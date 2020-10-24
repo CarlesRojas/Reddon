@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef } from "react";
 import SVG from "react-inlinesvg";
 
 // Contexts
@@ -14,6 +14,10 @@ export default function Navbar() {
 
     // State
     const [pageSwapped, setPageSwapped] = useState(false);
+    const lastPage = useRef("all");
+
+    // Save last page
+    if (currentSubreddit === "all" || currentSubreddit === "homeSubreddit") lastPage.current = currentSubreddit;
 
     // Swap page
     const swapPage = (page) => {
@@ -24,7 +28,10 @@ export default function Navbar() {
     // Animate the page buttons
     if (pageSwapped && currentSubreddit === "all") var backgroundStyle = " left";
     else if (pageSwapped) backgroundStyle = " right";
-    else backgroundStyle = "";
+    else backgroundStyle = lastPage.current === "all" ? " left" : " right";
+
+    // Reset swapped page
+    if (pageSwapped) setPageSwapped(false);
 
     // Handle zoom click
     const onZoomClicked = () => {

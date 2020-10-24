@@ -38,6 +38,10 @@ const RedditProvider = (props) => {
     // Subreddit images and info
     const subredditsInfo = useRef({});
 
+    // #################################################
+    //   AUTHENTICATION
+    // #################################################
+
     // Check and return access token
     const getAccessToken = async () => {
         // Retrieve Access Token
@@ -120,6 +124,10 @@ const RedditProvider = (props) => {
 
         return true;
     };
+
+    // #################################################
+    //   REDDIT API
+    // #################################################
 
     // Fetch the info for the subreddits in the list
     const fetchSubredditsInfo = async (posts, accessToken) => {
@@ -231,7 +239,7 @@ const RedditProvider = (props) => {
                 redirectUri,
                 clientID,
 
-                // Authentification
+                // Authentication
                 requestAccessToken,
                 refreshAccessToken,
 

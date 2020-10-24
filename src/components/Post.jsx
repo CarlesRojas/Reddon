@@ -20,7 +20,7 @@ export default function Post(props) {
 
     // Contexts
     const { unixTimeToDate, timeAgo } = useContext(Utils);
-    const { zooms, subredditsInfo } = useContext(Reddit);
+    const { zooms, subredditsInfo, setCurrentSubreddit } = useContext(Reddit);
 
     // Post data
     //console.log(postData);
@@ -117,11 +117,23 @@ export default function Post(props) {
     // Class for centering the upvoteBar in Videos
     var correctMargin = finalVideo && !embededVideo ? "" : " true";
 
+    // #################################################
+    //   SUBREDDIT CLICK
+    // #################################################
+
+    // Open the new subreddit if we are not in a custom subreddit already
+    const subredditClickHandle = () => {
+        if (currSubreddit === "all" || currSubreddit === "homeSubreddit") setCurrentSubreddit(subreddit);
+    };
+
     return (
         <div className="post">
             <div className="mainContent">
-                {subredditIcon}
-                <p className="subreddit">{subreddit}</p>
+                <div className="subredditLink" onClick={subredditClickHandle}>
+                    {subredditIcon}
+                    <p className="subreddit">{subreddit}</p>
+                </div>
+
                 <p className="author">{author + " · " + timeAgo(unixTimeToDate(created_utc), false)}</p>
                 <p className="title">{title}</p>
                 {finalMedia}

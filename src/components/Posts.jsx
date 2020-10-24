@@ -272,16 +272,14 @@ export default function Posts(props) {
     };
 
     // Loading
-    console.log(renderedItems);
     var loading = !renderedItems.length ? (
         <div className="loading">
             <SVG className="icon spin" src={RefreshIcon} />
         </div>
     ) : null;
-    console.log(loading);
 
     return (
-        <div className={"posts" + (subreddit === "all" ? "" : " right")}>
+        <div className={"posts" + (subreddit === "homeSubreddit" ? " right" : "")}>
             <animated.div className="container" {...gestureBind()} style={containerStyle}>
                 {renderedItems}
                 {loading}
