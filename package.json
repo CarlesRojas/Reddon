@@ -1,7 +1,7 @@
 {
     "name": "reddon",
     "version": "0.1.0",
-    "homepage": "https://carlesrojas.github.io/Reddon",
+    "homepage": ".",
     "private": true,
     "dependencies": {
         "node-sass": "^4.14.1",
