@@ -1,9 +1,9 @@
 import React, { useContext, useRef, useEffect } from "react";
-import { useHistory } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
 
 import Navbar from "components/Navbar";
 import Posts from "components/Posts";
+import SubredditBar from "components/SubredditBar";
 
 // Contexts
 import { Utils } from "contexts/Utils";
@@ -29,12 +29,18 @@ export default function Home() {
     useEffect(() => {
         window.onpopstate = function (event) {
             if (event.state && event.type === "popstate") {
+                // Clear the posts
+                subredditPosts.current = [];
+
+                // Set the previous subreddit as the current one
                 setCurrentSubreddit(prevSubreddit.current);
             }
         };
         return () => {
             window.onpopstate = null;
         };
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // #################################################
@@ -127,6 +133,7 @@ export default function Home() {
                 <div className="subredditPopup">
                     <Posts subreddit={currentSubreddit} posts={subredditPosts} firstPostsLoaded={firstPostsLoaded}></Posts>
                 </div>
+                <SubredditBar prevSubreddit={prevSubreddit}></SubredditBar>
             </animated.div>
         </div>
     );

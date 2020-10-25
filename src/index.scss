@@ -158,7 +158,7 @@ button {
 }
 
 // #######################################
-//      LANDING PAGE
+//      NAVBAR
 // #######################################
 
 .navbar {
@@ -260,6 +260,74 @@ button {
                 color: $text-dark;
             }
         }
+    }
+
+    .icon {
+        box-sizing: border-box;
+        width: $navbar-height;
+        min-width: $navbar-height;
+        max-width: $navbar-height;
+        padding: 10px;
+        transform: rotate(0deg);
+
+        &.active {
+            .cls-1,
+            .cls-2 {
+                stroke: $icon !important;
+
+                .dark & {
+                    stroke: $icon-dark !important;
+                }
+            }
+        }
+
+        .cls-1,
+        .cls-2 {
+            stroke: $icon-dimm !important;
+
+            .dark & {
+                stroke: $icon-dimm-dark !important;
+            }
+        }
+
+        &.invisible {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        &.spin {
+            animation: spin $animation-speed * 10 infinite;
+            animation-fill-mode: forwards;
+
+            @keyframes spin {
+                0% {
+                    transform: rotate(0deg);
+                }
+                100% {
+                    transform: rotate(359deg);
+                }
+            }
+        }
+    }
+}
+
+// #######################################
+//      SUBREDDIT BAR
+// #######################################
+
+.subredditBar {
+    box-sizing: border-box;
+    height: $navbar-height;
+    min-height: $navbar-height;
+    max-height: $navbar-height;
+    margin: $main-margin;
+    background-color: $foreground;
+    border-radius: $border-radius;
+    display: flex;
+    justify-content: space-between;
+
+    .dark & {
+        background: $foreground-dark;
     }
 
     .icon {
@@ -812,10 +880,13 @@ button {
     left: 0;
     top: -100%;
     z-index: 50;
+    display: flex;
+    flex-direction: column;
 
     .subredditPopup {
+        position: relative;
         width: 100%;
-        height: 100%;
+        flex-grow: 1;
         background-color: $background;
 
         .dark & {
