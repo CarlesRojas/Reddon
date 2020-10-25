@@ -139,7 +139,7 @@ const RedditProvider = (props) => {
                 // Fetch info if not present
                 if (!(data.subreddit_id in subredditsInfo.current)) {
                     // Fetch
-                    var rawResponse = await fetch(`https://oauth.reddit.com/r/${data.subreddit}/about`, {
+                    var rawResponse = await fetch(`https://oauth.reddit.com/r/${data.subreddit}/about?raw_json=1`, {
                         headers: {
                             Accept: "application/json, text/plain, */*",
                             Authorization: "bearer " + accessToken,
@@ -222,7 +222,7 @@ const RedditProvider = (props) => {
         POST_DATA.append("dir", vote);
 
         // Fetch
-        await fetch("https://oauth.reddit.com/api/vote", {
+        await fetch("https://oauth.reddit.com/api/vote?raw_json=1", {
             method: "post",
             headers: {
                 Accept: "application/json, text/plain, */*",
@@ -230,6 +230,52 @@ const RedditProvider = (props) => {
             },
             body: POST_DATA,
         });
+    };
+
+    // Get comments for a post
+    const getComments = async (subreddit, post) => {
+        var accessToken = await getAccessToken();
+
+        console.log("Get Comments");
+
+        // Post data
+        const POST_DATA = new FormData();
+        POST_DATA.append("article", post);
+
+        // Fetch
+        var rawResponse = await fetch(`https://oauth.reddit.com/r/${subreddit}/comments/${post}?raw_json=1&limit=20`, {
+            headers: {
+                Accept: "application/json, text/plain, */*",
+                Authorization: "bearer " + accessToken,
+            },
+        });
+
+        return await rawResponse.json();
+    };
+
+    // Fetch the info for the subreddits in the list
+    const fetchCommentAuthorsInfo = async (comments, authorsIcons) => {
+        var accessToken = await getAccessToken();
+
+        // Iterate the comments
+        await Promise.all(
+            comments.map(async ({ author, author_fullname }) => {
+                // Fetch info if not present
+                if (author && author_fullname && !(author_fullname in authorsIcons.current)) {
+                    // Fetch
+                    var rawResponse = await fetch(`https://oauth.reddit.com/user/${author}/about.json?raw_json=1`, {
+                        headers: {
+                            Accept: "application/json, text/plain, */*",
+                            Authorization: "bearer " + accessToken,
+                        },
+                    });
+                    const response = await rawResponse.json();
+
+                    // Save response
+                    authorsIcons.current[author_fullname] = response.data;
+                }
+            })
+        );
     };
 
     // Return the context
@@ -262,6 +308,10 @@ const RedditProvider = (props) => {
                 getPosts,
                 subredditsInfo,
                 vote,
+                getComments,
+
+                // Authors
+                fetchCommentAuthorsInfo,
             }}
         >
             {props.children}

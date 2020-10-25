@@ -105,7 +105,6 @@ export default function Home() {
 
             // Animation in progress -> Set the spring y value
             else if (!canceled) verticalNavigationSet({ y: SCREEN_HEIGHT + (down ? Math.min(my, 0) : 0) });
-            console.log(my);
         },
         { rubberband: true, filterTaps: true }
     );

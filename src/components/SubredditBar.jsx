@@ -34,7 +34,6 @@ export default function SubredditBar(props) {
     };
 
     //Subreddit icon
-    console.log("");
     if (
         currSubredditID.current in subredditsInfo.current &&
         "icon_img" in subredditsInfo.current[currSubredditID.current] &&

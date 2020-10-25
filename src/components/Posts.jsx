@@ -13,7 +13,7 @@ import { Reddit } from "contexts/Reddit";
 import RefreshIcon from "resources/Refresh.svg";
 
 // Constants
-const BUFFER = 10;
+const BUFFER = 5;
 const PLACEHOLDERS = 0;
 const LOAD_MORE_BUFFER = 30;
 const ROW_WIDTH = window.innerWidth;
