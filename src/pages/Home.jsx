@@ -1,4 +1,5 @@
 import React, { useContext, useRef, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
 
 import Navbar from "components/Navbar";
@@ -15,7 +16,26 @@ const SCREEN_HEIGHT = window.innerHeight;
 export default function Home() {
     // Contexts
     const { useForceUpdate } = useContext(Utils);
-    const { currentSubreddit, getPosts, allPosts, homePosts, subredditPosts } = useContext(Reddit);
+    const { currentSubreddit, setCurrentSubreddit, getPosts, allPosts, homePosts, subredditPosts } = useContext(Reddit);
+
+    // #################################################
+    //   ROUTER HISTORY AND BACK BUTTON
+    // #################################################
+
+    // Router history
+    const prevSubreddit = useRef(currentSubreddit);
+
+    // Intercept back button
+    useEffect(() => {
+        window.onpopstate = function (event) {
+            if (event.state && event.type === "popstate") {
+                setCurrentSubreddit(prevSubreddit.current);
+            }
+        };
+        return () => {
+            window.onpopstate = null;
+        };
+    }, []);
 
     // #################################################
     //   NAVIGATION SPRINGS
@@ -28,15 +48,20 @@ export default function Home() {
 
     // If there is a change in subreddit -> Swap to that
     if (currentSubreddit !== subreddit.current) {
-        subreddit.current = currentSubreddit;
-
         // If the subreddit is "all" or "homeSubreddit" -> Move to that subreddit
         if (currentSubreddit === "all" || currentSubreddit === "homeSubreddit") {
             horizontalNavigationSet({ x: currentSubreddit === "all" ? 0 : -SCREEN_WIDTH });
             verticalNavigationSet({ y: 0 });
         }
         // Otherwise, show the other subreddit
-        else verticalNavigationSet({ y: SCREEN_HEIGHT });
+        else {
+            window.history.pushState({}, "", "home");
+            verticalNavigationSet({ y: SCREEN_HEIGHT });
+        }
+
+        // Update previous ans current subreddit
+        if (subreddit.current === "all" || subreddit.current === "homeSubreddit") prevSubreddit.current = subreddit.current;
+        subreddit.current = currentSubreddit;
     }
 
     // #################################################
