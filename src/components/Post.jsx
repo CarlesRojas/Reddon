@@ -20,7 +20,10 @@ export default function Post(props) {
 
     // Contexts
     const { unixTimeToDate, timeAgo } = useContext(Utils);
-    const { zooms, subredditsInfo, setCurrentSubreddit } = useContext(Reddit);
+    const { zooms, subredditsInfo, setCurrentSubreddit, currSubredditID } = useContext(Reddit);
+
+    // Zoom access elem
+    const zoomSubredditKey = currSubreddit === "all" ? "all" : currSubreddit === "homeSubreddit" ? "homeSubreddit" : "subreddit";
 
     // Post data
     //console.log(postData);
@@ -81,7 +84,7 @@ export default function Post(props) {
     // Image gallery
     const images =
         media_metadata && Object.values(media_metadata).length ? (
-            <Images images={Object.values(media_metadata)} zoomed={zooms[currSubreddit]}></Images>
+            <Images images={Object.values(media_metadata)} zoomed={zooms[zoomSubredditKey]}></Images>
         ) : null;
 
     //   VIDEO
@@ -123,7 +126,10 @@ export default function Post(props) {
 
     // Open the new subreddit if we are not in a custom subreddit already
     const subredditClickHandle = () => {
-        if (currSubreddit === "all" || currSubreddit === "homeSubreddit") setCurrentSubreddit(subreddit);
+        if (currSubreddit === "all" || currSubreddit === "homeSubreddit") {
+            setCurrentSubreddit(subreddit);
+            currSubredditID.current = subreddit_id;
+        }
     };
 
     return (

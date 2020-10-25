@@ -26,6 +26,9 @@ export default function Posts(props) {
     const { clamp } = useContext(Utils);
     const { zooms, setZooms, getPosts } = useContext(Reddit);
 
+    // Zoom access elem
+    const zoomSubredditKey = subreddit === "all" ? "all" : subreddit === "homeSubreddit" ? "homeSubreddit" : "subreddit";
+
     // #################################################
     //   LOAD MORE POSTS
     // #################################################
@@ -54,7 +57,7 @@ export default function Posts(props) {
     // Handles a change in the zoom
     useEffect(() => {
         // Snap to current post
-        if (!zooms[subreddit]) {
+        if (!zooms[zoomSubredditKey]) {
             setX({ x: index.current * -ROW_WIDTH, config: { decay: false, velocity: 0 } });
 
             // Load posts if needed
@@ -65,7 +68,7 @@ export default function Posts(props) {
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [zooms[subreddit]]);
+    }, [zooms[zoomSubredditKey]]);
 
     // Handles a click on a post while zoomed in
     const postClickedHandle = (postClickedIndex) => {
@@ -97,7 +100,7 @@ export default function Posts(props) {
     const index = useRef(0);
 
     // Refs that mirror the state
-    const zoomedRef = useRef(zooms[subreddit]);
+    const zoomedRef = useRef(zooms[zoomSubredditKey]);
 
     // Update the index when the inertia position changes
     const onInertiaChangeHandle = (xDispl) => {
@@ -131,7 +134,7 @@ export default function Posts(props) {
             if (first && Math.abs(vy) >= Math.abs(vx)) cancel();
 
             // Zoomed -> Move with inertia
-            if (zooms[subreddit]) {
+            if (zooms[zoomSubredditKey]) {
                 // While gesture is active -> Move without inertia
                 if (down) setX({ x: mx, config: { decay: false, velocity: 0 } });
                 // When the gesture ends -> Apply inertia
@@ -161,7 +164,7 @@ export default function Posts(props) {
                 }
             }
         },
-        { initial: () => [zooms[subreddit] ? x.get() : 0, 0], rubberband: true, filterTaps: true }
+        { initial: () => [zooms[zoomSubredditKey] ? x.get() : 0, 0], rubberband: true, filterTaps: true }
     );
 
     // #################################################
@@ -172,8 +175,8 @@ export default function Posts(props) {
     var transitionStyle = {};
 
     // Animate only when zoom changes
-    if (zoomedRef.current !== zooms[subreddit] || animating.current) {
-        if (zoomedRef.current !== zooms[subreddit]) zoomedRef.current = zooms[subreddit];
+    if (zoomedRef.current !== zooms[zoomSubredditKey] || animating.current) {
+        if (zoomedRef.current !== zooms[zoomSubredditKey]) zoomedRef.current = zooms[zoomSubredditKey];
         animating.current = true;
 
         // Stop animating in 0.2s
@@ -210,7 +213,7 @@ export default function Posts(props) {
             var animatedPositionStyle = {};
 
             // Get the style for the post
-            if (zooms[subreddit]) {
+            if (zooms[zoomSubredditKey]) {
                 // Scale spring
                 animatedScaleStyle = {
                     transform: x.to((x) => {

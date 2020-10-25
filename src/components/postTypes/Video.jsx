@@ -64,7 +64,7 @@ export default function Video(props) {
             <ReactPlayer
                 url={url}
                 controls
-                volume={0.1}
+                volume={0.5}
                 playing={playback.playing}
                 width="100%"
                 height="100%"

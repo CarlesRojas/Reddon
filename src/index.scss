@@ -321,6 +321,7 @@ button {
     min-height: $navbar-height;
     max-height: $navbar-height;
     margin: $main-margin;
+    width: calc(100% - #{$main-margin * 2});
     background-color: $foreground;
     border-radius: $border-radius;
     display: flex;
@@ -330,6 +331,37 @@ button {
         background: $foreground-dark;
     }
 
+    .currentSubreddit {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: calc(100% - #{$navbar-height * 3});
+        max-width: calc(100% - #{$navbar-height * 3});
+
+        p {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-transform: capitalize;
+            font-weight: 500;
+            text-align: center;
+            color: $text;
+
+            .dark & {
+                color: $text-dark;
+            }
+        }
+
+        .barSubredditIcon {
+            box-sizing: border-box;
+            width: $navbar-height;
+            min-width: $navbar-height;
+            max-width: $navbar-height;
+            padding: 10px;
+            border-radius: 500px;
+        }
+    }
+
     .icon {
         box-sizing: border-box;
         width: $navbar-height;
@@ -337,6 +369,10 @@ button {
         max-width: $navbar-height;
         padding: 10px;
         transform: rotate(0deg);
+
+        #Close rect {
+            stroke-width: 0;
+        }
 
         &.active {
             .cls-1,
@@ -875,6 +911,17 @@ button {
 //      SUBREDDIT POPUP
 // #######################################
 
+.opacityScreen {
+    position: absolute;
+    z-index: 25;
+    pointer-events: none;
+    background-color: $background;
+
+    .dark & {
+        background-color: $background-dark;
+    }
+}
+
 .subredditPopupContainer {
     position: absolute;
     left: 0;
@@ -882,16 +929,16 @@ button {
     z-index: 50;
     display: flex;
     flex-direction: column;
+    background-color: $background;
+
+    .dark & {
+        background-color: $background-dark;
+    }
 
     .subredditPopup {
         position: relative;
         width: 100%;
         flex-grow: 1;
-        background-color: $background;
-
-        .dark & {
-            background-color: $background-dark;
-        }
     }
 }
 

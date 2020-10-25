@@ -18,6 +18,7 @@ const RedditProvider = (props) => {
 
     // Current subreddit
     const [currentSubreddit, setCurrentSubreddit] = useState("all");
+    const currSubredditID = useRef("");
 
     // All posts and next
     const allPosts = useRef([]);
@@ -246,6 +247,7 @@ const RedditProvider = (props) => {
                 // Current Subreddit
                 currentSubreddit,
                 setCurrentSubreddit,
+                currSubredditID,
 
                 // Subreddit posts
                 allPosts,

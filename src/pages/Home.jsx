@@ -16,8 +16,8 @@ const SCREEN_HEIGHT = window.innerHeight;
 
 export default function Home() {
     // Contexts
-    const { useForceUpdate } = useContext(Utils);
-    const { currentSubreddit, setCurrentSubreddit, getPosts, allPosts, homePosts, subredditPosts } = useContext(Reddit);
+    const { useForceUpdate, invlerp } = useContext(Utils);
+    const { currentSubreddit, setCurrentSubreddit, getPosts, allPosts, homePosts, subredditPosts, setZooms, zooms } = useContext(Reddit);
 
     // #################################################
     //   ROUTER HISTORY AND BACK BUTTON
@@ -32,6 +32,9 @@ export default function Home() {
             if (event.state && event.type === "popstate") {
                 // Clear the posts
                 subredditPosts.current = [];
+
+                // Remove zoom
+                setZooms({ ...zooms, subreddit: false });
 
                 // Set the previous subreddit as the current one
                 setCurrentSubreddit(prevSubreddit.current);
@@ -48,10 +51,24 @@ export default function Home() {
     //   NAVIGATION SPRINGS
     // #################################################
 
+    // Handle navigation rest for the vertical navigation
+    const verticalNavigationRestHandle = (data) => {
+        if (data.value <= 5) {
+            // Clear the posts
+            subredditPosts.current = [];
+
+            // Remove zoom
+            setZooms({ ...zooms, subreddit: false });
+
+            // Set the previous subreddit as the current one
+            setCurrentSubreddit(prevSubreddit.current);
+        }
+    };
+
     // Horizontal avigation spring
     const subreddit = useRef("");
     const [{ x }, horizontalNavigationSet] = useSpring(() => ({ x: 0 }));
-    const [{ y }, verticalNavigationSet] = useSpring(() => ({ y: 0 }));
+    const [{ y }, verticalNavigationSet] = useSpring(() => ({ y: 0, onRest: verticalNavigationRestHandle }));
 
     // If there is a change in subreddit -> Swap to that
     if (currentSubreddit !== subreddit.current) {
@@ -76,18 +93,19 @@ export default function Home() {
     // #################################################
 
     const gestureBind = useDrag(
-        ({ down, first, last, vxvy: [vx, vy], movement: [mx, my], distance, cancel, canceled }) => {
+        ({ down, first, last, vxvy: [vx, vy], movement: [, my], distance, cancel, canceled }) => {
             // If gesture is horizontal -> Cancel event
             if (first && Math.abs(vx) >= Math.abs(vy)) cancel();
 
             // Complete gesture
-            if (!canceled && ((down && distance > SCREEN_HEIGHT * 0.5) || (last && Math.abs(vy) > 0.15))) {
+            if (!canceled && ((down && distance > SCREEN_HEIGHT * 0.5) || (last && vy < -0.15))) {
                 verticalNavigationSet({ y: 0 });
                 cancel();
             }
 
             // Animation in progress -> Set the spring y value
-            else if (!canceled) verticalNavigationSet({ y: SCREEN_HEIGHT + (down ? my : 0) });
+            else if (!canceled) verticalNavigationSet({ y: SCREEN_HEIGHT + (down ? Math.min(my, 0) : 0) });
+            console.log(my);
         },
         { rubberband: true, filterTaps: true }
     );
@@ -151,6 +169,14 @@ export default function Home() {
 
             <Navbar></Navbar>
 
+            <animated.div
+                className="opacityScreen"
+                style={{
+                    opacity: y.to((y) => invlerp(0, SCREEN_HEIGHT, y)),
+                    width: SCREEN_WIDTH,
+                    height: SCREEN_HEIGHT,
+                }}
+            ></animated.div>
             <animated.div className="subredditPopupContainer" style={{ y, width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}>
                 <div className="subredditPopup">
                     <Posts subreddit={currentSubreddit} posts={subredditPosts} firstPostsLoaded={firstPostsLoaded}></Posts>

@@ -8,7 +8,7 @@ import { Reddit } from "contexts/Reddit";
 import RefreshIcon from "resources/Refresh.svg";
 import RecentIcon from "resources/Recent.svg";
 
-export default function Navbar() {
+export default function Navbar(props) {
     // Contexts
     const { zooms, setZooms, currentSubreddit, setCurrentSubreddit } = useContext(Reddit);
 
@@ -37,7 +37,6 @@ export default function Navbar() {
     const onZoomClicked = () => {
         if (currentSubreddit === "all") setZooms({ ...zooms, all: !zooms.all });
         else if (currentSubreddit === "homeSubreddit") setZooms({ ...zooms, homeSubreddit: !zooms.homeSubreddit });
-        else setZooms({ ...zooms, subreddit: !zooms.subreddit });
     };
 
     return (
