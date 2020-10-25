@@ -16,7 +16,7 @@ const SCREEN_HEIGHT = window.innerHeight;
 export default function Home() {
     // Contexts
     const { useForceUpdate } = useContext(Utils);
-    const { currentSubreddit, getPosts, allPosts, homePosts } = useContext(Reddit);
+    const { currentSubreddit, getPosts, allPosts, homePosts, subredditPosts } = useContext(Reddit);
 
     // #################################################
     //   NAVIGATION SPRINGS
@@ -49,6 +49,23 @@ export default function Home() {
 
     // Force update
     const forceUpdate = useForceUpdate();
+
+    // Load new posts for the custom subreddit
+    useEffect(() => {
+        // Load fewer posts to show them faster to the user
+        async function loadFirstPosts() {
+            // Get first posts for "all" and "homeSubreddit"
+            await getPosts(currentSubreddit, 8, true);
+
+            // Force update
+            forceUpdate();
+        }
+
+        // Load first posts
+        if (!subredditPosts.length && currentSubreddit !== "all" && currentSubreddit !== "homeSubreddit") loadFirstPosts();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentSubreddit]);
 
     // Component did mount
     useEffect(() => {
@@ -83,7 +100,9 @@ export default function Home() {
             <Navbar></Navbar>
 
             <animated.div className="subredditPopupContainer" style={{ y, width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}>
-                <SubredditPopup open={currentSubreddit !== "all" && currentSubreddit !== "homeSubreddit"}></SubredditPopup>
+                <div className="subredditPopup">
+                    <Posts subreddit={currentSubreddit} posts={subredditPosts} firstPostsLoaded={firstPostsLoaded}></Posts>
+                </div>
             </animated.div>
         </div>
     );
