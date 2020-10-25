@@ -1,5 +1,6 @@
 import React, { useContext, useRef, useEffect } from "react";
 import { useSpring, animated } from "react-spring";
+import { useDrag } from "react-use-gesture";
 
 import Navbar from "components/Navbar";
 import Posts from "components/Posts";
@@ -71,6 +72,27 @@ export default function Home() {
     }
 
     // #################################################
+    //   NAVIGATION GESTURE
+    // #################################################
+
+    const gestureBind = useDrag(
+        ({ down, first, last, vxvy: [vx, vy], movement: [mx, my], distance, cancel, canceled }) => {
+            // If gesture is horizontal -> Cancel event
+            if (first && Math.abs(vx) >= Math.abs(vy)) cancel();
+
+            // Complete gesture
+            if (!canceled && ((down && distance > SCREEN_HEIGHT * 0.5) || (last && Math.abs(vy) > 0.15))) {
+                verticalNavigationSet({ y: 0 });
+                cancel();
+            }
+
+            // Animation in progress -> Set the spring y value
+            else if (!canceled) verticalNavigationSet({ y: SCREEN_HEIGHT + (down ? my : 0) });
+        },
+        { rubberband: true, filterTaps: true }
+    );
+
+    // #################################################
     //   FETCH FIRST POSTS
     // #################################################
 
@@ -133,7 +155,9 @@ export default function Home() {
                 <div className="subredditPopup">
                     <Posts subreddit={currentSubreddit} posts={subredditPosts} firstPostsLoaded={firstPostsLoaded}></Posts>
                 </div>
-                <SubredditBar prevSubreddit={prevSubreddit}></SubredditBar>
+                <div {...gestureBind()}>
+                    <SubredditBar prevSubreddit={prevSubreddit}></SubredditBar>
+                </div>
             </animated.div>
         </div>
     );
