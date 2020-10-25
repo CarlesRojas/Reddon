@@ -3,7 +3,6 @@ import { useSpring, animated } from "react-spring";
 
 import Navbar from "components/Navbar";
 import Posts from "components/Posts";
-import SubredditPopup from "components/SubredditPopup";
 
 // Contexts
 import { Utils } from "contexts/Utils";
