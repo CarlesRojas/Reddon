@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState, memo } from "react";
+import React, { useContext, useRef, useState, useEffect, memo } from "react";
 import { useSpring, animated } from "react-spring";
 import ReactHtmlParser from "react-html-parser";
 
@@ -116,11 +116,7 @@ export default function Post(props) {
     //   SUBREDDIT INFO
     // #################################################
 
-    if (
-        subreddit_id in subredditsInfo.current &&
-        "icon_img" in subredditsInfo.current[subreddit_id] &&
-        subredditsInfo.current[subreddit_id].icon_img
-    ) {
+    if (subreddit_id in subredditsInfo.current && "icon_img" in subredditsInfo.current[subreddit_id] && subredditsInfo.current[subreddit_id].icon_img) {
         var subredditIcon = <img className="subredditIcon" src={subredditsInfo.current[subreddit_id].icon_img} alt=""></img>;
     } else subredditIcon = <img className="subredditIcon" src={ReddonLogo} alt=""></img>;
 
@@ -138,25 +134,16 @@ export default function Post(props) {
     // #################################################
 
     // Image
-    const image =
-        preview && preview.images && preview.images.length ? (
-            <Image images={preview.images} url={url} domain={domain} post_hint={post_hint}></Image>
-        ) : null;
+    const image = preview && preview.images && preview.images.length ? <Image images={preview.images} url={url} domain={domain} post_hint={post_hint}></Image> : null;
 
     // Image gallery
-    const images =
-        media_metadata && Object.values(media_metadata).length ? (
-            <Images images={Object.values(media_metadata)} zoomed={zooms[zoomSubredditKey]}></Images>
-        ) : null;
+    const images = media_metadata && Object.values(media_metadata).length ? <Images images={Object.values(media_metadata)} zoomed={zooms[zoomSubredditKey]}></Images> : null;
 
     //   VIDEO
     // #################################################
 
     // Video Preview
-    const video =
-        preview && preview.reddit_video_preview ? (
-            <Video video={preview.reddit_video_preview} index={index} currSubreddit={currSubreddit}></Video>
-        ) : null;
+    const video = preview && preview.reddit_video_preview ? <Video video={preview.reddit_video_preview} index={index} currSubreddit={currSubreddit}></Video> : null;
 
     // Reddit video
     const redditVideo = media && media.reddit_video ? <Video video={media.reddit_video} index={index} currSubreddit={currSubreddit}></Video> : null;
@@ -284,15 +271,43 @@ export default function Post(props) {
         });
     };
 
+    const loadComments = async () => {
+        commentsLoaded.current = true;
+        console.log("Loading Comments");
+
+        // Get the first comments
+        const firstComments = await getComments(subreddit, id, 20);
+
+        // Process comments
+        const processedFirstComments = await processComments(firstComments);
+
+        // Set first comments
+        comments.current = processedFirstComments;
+        setCommentTree(getCommentsTree(comments.current));
+    };
+
     // Create comment Tree
     const commentsLoaded = useRef(false);
-    if (!commentsLoaded.current) {
-        commentsLoaded.current = true;
-        processComments(getComments(subreddit, id)).then((result) => {
-            comments.current = result;
-            setCommentTree(getCommentsTree(comments.current));
-        });
-    }
+
+    // Get the comments if it is the first post
+    if (!commentsLoaded.current && index === 0) loadComments();
+
+    // Handle a change in the current index
+    const indexChangeHandle = ({ subreddit: eventSubreddit, index: eventIndex }) => {
+        // If the current post is this one
+        if (eventSubreddit === currSubreddit && index >= eventIndex - 1 && index <= eventIndex + 1 && !commentsLoaded.current) loadComments();
+    };
+
+    // Listen for events
+    useEffect(() => {
+        window.PubSub.sub("onIndexChange", indexChangeHandle);
+
+        return function cleanup() {
+            window.PubSub.unsub("onIndexChange", indexChangeHandle);
+        };
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // #################################################
     //   RENDER

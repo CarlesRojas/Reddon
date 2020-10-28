@@ -233,17 +233,15 @@ const RedditProvider = (props) => {
     };
 
     // Get comments for a post
-    const getComments = async (subreddit, post) => {
+    const getComments = async (subreddit, post, limit = 50) => {
         var accessToken = await getAccessToken();
-
-        console.log("Get Comments");
 
         // Post data
         const POST_DATA = new FormData();
         POST_DATA.append("article", post);
 
         // Fetch
-        var rawResponse = await fetch(`https://oauth.reddit.com/r/${subreddit}/comments/${post}?raw_json=1&limit=20`, {
+        var rawResponse = await fetch(`https://oauth.reddit.com/r/${subreddit}/comments/${post}?raw_json=1&limit=${limit}`, {
             headers: {
                 Accept: "application/json, text/plain, */*",
                 Authorization: "bearer " + accessToken,
