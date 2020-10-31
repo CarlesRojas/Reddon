@@ -85,6 +85,12 @@ const Post = memo((props) => {
 
     // Zoom access elem
     const zoomSubredditKey = currSubreddit === "all" ? "all" : currSubreddit === "homeSubreddit" ? "homeSubreddit" : "subreddit";
+    const currZoom = useRef(zooms[zoomSubredditKey]);
+
+    // Keep zoom updated
+    useEffect(() => {
+        currZoom.current = zooms[zoomSubredditKey];
+    }, [zooms]);
 
     // Post data
     const {
@@ -204,26 +210,48 @@ const Post = memo((props) => {
     };
 
     // Load the comments
-    getComments(subreddit, id, name, 100);
+    getComments(subreddit, id, name, 50);
+
+    // State to hold if this is the current post being seen
+    const isCurrent = useRef(false);
+
+    // Timeout to start rendering the comments
+    const showCommentsTimeout = useRef(null);
+
+    // State to hold if the comment tree has been set or not
+    const commentTreeSet = useRef(false);
 
     // Show the comments
     const indexChangeHandle = ({ subreddit: eventSubreddit, index: eventIndex }) => {
         // If the current post is this one
-        if (eventSubreddit === currSubreddit && index === eventIndex && !zooms[zoomSubredditKey]) {
-            console.log(currSubreddit);
-            console.log(index);
-            console.log(zooms[zoomSubredditKey]);
-            console.log("");
+        isCurrent.current = eventSubreddit === currSubreddit && index === eventIndex && !currZoom.current;
+
+        // Cancel the showing of comments if this is no longer the focused post
+        if (!isCurrent.current) clearTimeout(showCommentsTimeout.current);
+    };
+
+    // Show the comments
+    const inertiaStopHandle = () => {
+        if (isCurrent.current && !commentTreeSet.current) {
+            // If this is the focused post, load them after half a second
+            showCommentsTimeout.current = setTimeout(async () => {
+                console.time("setTree " + name);
+                await setCommentTree(getCommentsTree(postComments.current[name]));
+                console.timeEnd("setTree " + name);
+
+                commentTreeSet.current = true;
+            }, 500);
         }
-        //if (eventSubreddit === currSubreddit && index === eventIndex && !zooms[zoomSubredditKey]) setCommentTree(getCommentsTree(postComments.current[name]));
     };
 
     // Listen for events
     useEffect(() => {
         window.PubSub.sub("onIndexChange", indexChangeHandle);
+        window.PubSub.sub("onInertiaStop", inertiaStopHandle);
 
-        return function cleanup() {
+        return () => {
             window.PubSub.unsub("onIndexChange", indexChangeHandle);
+            window.PubSub.unsub("onInertiaStop", inertiaStopHandle);
         };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps

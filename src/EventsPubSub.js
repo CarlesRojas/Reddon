@@ -35,4 +35,9 @@ export default class EventsPubSub {
         subreddit:      Subreddit where the index has changed: "all", "homeSubreddit" or "subreddit"
         index:          New index
     },
+
+    {
+        event:          onInertiaStop
+        desciption:     Called when the posts stop moving
+    },
 */

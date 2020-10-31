@@ -103,7 +103,7 @@ export default function Posts(props) {
     const zoomedRef = useRef(zooms[zoomSubredditKey]);
 
     // Update the index when the inertia position changes
-    const onInertiaChangeHandle = (xDispl) => {
+    const inertiaChangeHandle = (xDispl) => {
         // Set the current scroll left
         setScrollLeft(-xDispl);
 
@@ -130,8 +130,14 @@ export default function Posts(props) {
         }
     };
 
+    // Signal that the component has stoped moving
+    const onInertiaRestHandle = () => {
+        // Inform about the post stoping
+        window.PubSub.emit("onInertiaStop");
+    };
+
     // InertiaSpring
-    const [{ x }, setX] = useSpring(() => ({ x: 0, onChange: onInertiaChangeHandle }));
+    const [{ x }, setX] = useSpring(() => ({ x: 0, onChange: inertiaChangeHandle, onRest: onInertiaRestHandle }));
 
     // Scroll Gesture
     const gestureBind = useDrag(

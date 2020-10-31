@@ -52,7 +52,7 @@ export default function Video(props) {
     useEffect(() => {
         window.PubSub.sub("onIndexChange", indexChangeHandle);
 
-        return function cleanup() {
+        return () => {
             window.PubSub.unsub("onIndexChange", indexChangeHandle);
         };
 
