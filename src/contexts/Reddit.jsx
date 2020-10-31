@@ -45,6 +45,9 @@ const RedditProvider = (props) => {
     // Icons for all the authors in the comments
     const authorsIcons = useRef({});
 
+    // State of the comments: closed or opened
+    const commentOpen = useRef({});
+
     // #################################################
     //   AUTHENTICATION
     // #################################################
@@ -238,6 +241,29 @@ const RedditProvider = (props) => {
         });
     };
 
+    // Fetch the info for the subreddits in the list
+    const fetchCommentAuthorsInfo = async (comments) => {
+        var accessToken = await getAccessToken();
+
+        // Iterate the comments
+        comments.map(async ({ author, author_fullname }) => {
+            // Fetch info if not present
+            if (author && author_fullname && !(author_fullname in authorsIcons.current)) {
+                // Fetch
+                var rawResponse = await fetch(`https://oauth.reddit.com/user/${author}/about.json?raw_json=1`, {
+                    headers: {
+                        Accept: "application/json, text/plain, */*",
+                        Authorization: "bearer " + accessToken,
+                    },
+                });
+                const response = await rawResponse.json();
+
+                // Save response
+                authorsIcons.current[author_fullname] = response.data;
+            }
+        });
+    };
+
     // Get comments for a post
     const getComments = async (subreddit, post, postID, limit = 50) => {
         // Return if already loaded
@@ -288,7 +314,7 @@ const RedditProvider = (props) => {
             );
 
             // Get author icons
-            //await fetchCommentAuthorsInfo(commentElems, authorsIcons);
+            fetchCommentAuthorsInfo(commentElems);
 
             return commentElems;
         };
@@ -321,31 +347,6 @@ const RedditProvider = (props) => {
 
         // Save the comments
         postComments.current[postID] = processedFirstComments;
-    };
-
-    // Fetch the info for the subreddits in the list
-    const fetchCommentAuthorsInfo = async (comments, authorsIcons) => {
-        var accessToken = await getAccessToken();
-
-        // Iterate the comments
-        await Promise.all(
-            comments.map(async ({ author, author_fullname }) => {
-                // Fetch info if not present
-                if (author && author_fullname && !(author_fullname in authorsIcons.current)) {
-                    // Fetch
-                    var rawResponse = await fetch(`https://oauth.reddit.com/user/${author}/about.json?raw_json=1`, {
-                        headers: {
-                            Accept: "application/json, text/plain, */*",
-                            Authorization: "bearer " + accessToken,
-                        },
-                    });
-                    const response = await rawResponse.json();
-
-                    // Save response
-                    authorsIcons.current[author_fullname] = response.data;
-                }
-            })
-        );
     };
 
     // Return the context
@@ -381,6 +382,7 @@ const RedditProvider = (props) => {
                 getComments,
                 postComments,
                 authorsIcons,
+                commentOpen,
             }}
         >
             {props.children}

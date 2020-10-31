@@ -20,26 +20,29 @@ import Video from "components/postTypes/Video";
 const Comment = memo(({ children, commentData, style, defaultOpen = true, icons }) => {
     // Contexts
     const { usePrevious, useMeasure } = useContext(Utils);
-
-    // State to hold if it is open or not
-    const [isOpen, setOpen] = useState(defaultOpen);
-
-    // Hook for knowing if parent is closed
-    const previous = usePrevious(isOpen);
-
-    // Size of the replies
-    const [bind, { height: viewHeight }] = useMeasure();
-
-    // Comment enter and exit spring
-    const { height, opacity, transform } = useSpring({
-        from: { height: 0, opacity: 0, transform: "translate3d(20px,0,0)" },
-        to: { height: isOpen ? viewHeight : 0, opacity: isOpen ? 1 : 0, transform: `translate3d(${isOpen ? 0 : 20}px,0,0)` },
-    });
+    const { commentOpen } = useContext(Reddit);
 
     // If it is a comment
     if (commentData.type === "comment") {
         // Deconstruct comment
-        const { author, author_fullname, created, body_html } = commentData;
+        const { author, author_fullname, created, body_html, name } = commentData;
+
+        // State to hold if it is open or not
+        if (!(name in commentOpen.current)) commentOpen.current[name] = defaultOpen;
+
+        const [isOpen, setOpen] = useState(commentOpen.current[name]);
+
+        // Hook for knowing if parent is closed
+        const previous = usePrevious(isOpen);
+
+        // Size of the replies
+        const [bind, { height: viewHeight }] = useMeasure();
+
+        // Comment enter and exit spring
+        const { height, opacity, transform } = useSpring({
+            from: { height: 0, opacity: 0, transform: "translate3d(20px,0,0)" },
+            to: { height: isOpen ? viewHeight : 0, opacity: isOpen ? 1 : 0, transform: `translate3d(${isOpen ? 0 : 20}px,0,0)` },
+        });
 
         // Author icon
         if (author_fullname in icons.current && "icon_img" in icons.current[author_fullname] && icons.current[author_fullname].icon_img) {
@@ -49,9 +52,15 @@ const Comment = memo(({ children, commentData, style, defaultOpen = true, icons 
         // Comment body
         const commentBody = body_html ? <div className="commentText">{ReactHtmlParser(body_html)}</div> : null;
 
+        // Handle click on the comment
+        const clickHandle = () => {
+            commentOpen.current[name] = !isOpen;
+            setOpen(!isOpen);
+        };
+
         return (
             <div className="comment">
-                <div className="content" style={style} onClick={() => setOpen(!isOpen)}>
+                <div className="content" style={style} onClick={clickHandle}>
                     <div className="authorInfo">
                         {authorIcon}
                         <span className="authorName">{author}</span>
@@ -90,6 +99,8 @@ const Post = memo((props) => {
     // Keep zoom updated
     useEffect(() => {
         currZoom.current = zooms[zoomSubredditKey];
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [zooms]);
 
     // Post data
@@ -223,6 +234,7 @@ const Post = memo((props) => {
 
     // Show the comments
     const indexChangeHandle = ({ subreddit: eventSubreddit, index: eventIndex }) => {
+        if (currSubreddit === "all" && index === 1) console.log(eventSubreddit + " " + eventIndex + " " + currZoom.current);
         // If the current post is this one
         isCurrent.current = eventSubreddit === currSubreddit && index === eventIndex && !currZoom.current;
 
@@ -235,9 +247,7 @@ const Post = memo((props) => {
         if (isCurrent.current && !commentTreeSet.current) {
             // If this is the focused post, load them after half a second
             showCommentsTimeout.current = setTimeout(async () => {
-                console.time("setTree " + name);
                 await setCommentTree(getCommentsTree(postComments.current[name]));
-                console.timeEnd("setTree " + name);
 
                 commentTreeSet.current = true;
             }, 500);
@@ -246,6 +256,7 @@ const Post = memo((props) => {
 
     // Listen for events
     useEffect(() => {
+        if (currSubreddit === "all" && index === 1) console.log("SUB");
         window.PubSub.sub("onIndexChange", indexChangeHandle);
         window.PubSub.sub("onInertiaStop", inertiaStopHandle);
 

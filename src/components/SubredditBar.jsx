@@ -18,6 +18,7 @@ export default function SubredditBar(props) {
 
     // Handle zoom click
     const onZoomClicked = () => {
+        console.log("Zoom 3");
         setZooms({ ...zooms, subreddit: !zooms.subreddit });
     };
 
@@ -27,6 +28,7 @@ export default function SubredditBar(props) {
         subredditPosts.current = [];
 
         // Remove zoom
+        console.log("Zoom 4");
         setZooms({ ...zooms, subreddit: false });
 
         // Set the previous subreddit as the current one

@@ -34,6 +34,7 @@ export default function Home() {
                 subredditPosts.current = [];
 
                 // Remove zoom
+                console.log("Zoom 5");
                 setZooms({ ...zooms, subreddit: false });
 
                 // Set the previous subreddit as the current one
@@ -58,6 +59,7 @@ export default function Home() {
             subredditPosts.current = [];
 
             // Remove zoom
+            console.log("Zoom 6");
             setZooms({ ...zooms, subreddit: false });
 
             // Set the previous subreddit as the current one
@@ -158,6 +160,8 @@ export default function Home() {
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    console.log("RENDER HOME");
 
     return (
         <div className="app">

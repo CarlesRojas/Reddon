@@ -35,6 +35,7 @@ export default function Navbar(props) {
 
     // Handle zoom click
     const onZoomClicked = () => {
+        console.log("Zoom 1");
         if (currentSubreddit === "all") setZooms({ ...zooms, all: !zooms.all });
         else if (currentSubreddit === "homeSubreddit") setZooms({ ...zooms, homeSubreddit: !zooms.homeSubreddit });
     };
