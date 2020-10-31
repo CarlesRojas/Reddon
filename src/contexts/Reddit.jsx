@@ -7,10 +7,10 @@ export const Reddit = createContext();
 
 const RedditProvider = (props) => {
     // Context
-    const { setCookie, getCookie } = useContext(Utils);
+    const { setCookie, getCookie, unixTimeToDate, timeAgo } = useContext(Utils);
 
     // Redirect uri & Client ID
-    const redirectUri = "https://reddon.netlify.app"; // http://localhost:3000
+    const redirectUri = "http://localhost:3000"; // "https://reddon.netlify.app"
     const clientID = "y7VNHo_M9CHwlA";
 
     // Refresh token timeout
@@ -38,6 +38,12 @@ const RedditProvider = (props) => {
 
     // Subreddit images and info
     const subredditsInfo = useRef({});
+
+    // Posts comments
+    const postComments = useRef({});
+
+    // Icons for all the authors in the comments
+    const authorsIcons = useRef({});
 
     // #################################################
     //   AUTHENTICATION
@@ -233,12 +239,73 @@ const RedditProvider = (props) => {
     };
 
     // Get comments for a post
-    const getComments = async (subreddit, post, limit = 50) => {
-        var accessToken = await getAccessToken();
+    const getComments = async (subreddit, post, postID, limit = 50) => {
+        // Return if already loaded
+        if (postID in postComments.current) return;
+        postComments.current[postID] = [];
 
-        // Post data
-        const POST_DATA = new FormData();
-        POST_DATA.append("article", post);
+        // Get all replies as array
+        const getReplies = async (replyArray) => {
+            // Format replies
+            var commentElems = await Promise.all(
+                replyArray.map(async ({ kind, data }) => {
+                    // If it is a reply -> Get its body and recursively get its replies
+                    if (kind === "t1") {
+                        // Destructure
+                        const { name, author, author_fullname, body, body_html, likes, locked, replies, score, created_utc } = data;
+
+                        // Get Replies
+                        var repliesTreated = replies ? await getReplies(replies.data.children) : null;
+
+                        // Return relevant information
+                        return {
+                            type: "comment",
+                            name,
+                            author,
+                            author_fullname,
+                            body,
+                            body_html,
+                            likes,
+                            locked,
+                            replies: repliesTreated,
+                            score,
+                            created: timeAgo(unixTimeToDate(created_utc)),
+                        };
+                    }
+
+                    // If it is a link to more replies -> Get the link info
+                    else if (kind === "more") {
+                        // Destructure
+                        const { children, count } = data;
+
+                        // Return relevant information
+                        return { type: "more", children, count };
+                    }
+
+                    // Incorrect object
+                    else return null;
+                })
+            );
+
+            // Get author icons
+            //await fetchCommentAuthorsInfo(commentElems, authorsIcons);
+
+            return commentElems;
+        };
+
+        // Process comments
+        const processComments = async (rawComments) => {
+            // Not a comments object
+            if (rawComments.length < 2 || !("data" in rawComments[1]) || !("children" in rawComments[1].data)) return [];
+
+            // Comments array
+            var commentsArray = rawComments[1].data.children;
+
+            // Get the replies for the post
+            return await getReplies(commentsArray);
+        };
+
+        var accessToken = await getAccessToken();
 
         // Fetch
         var rawResponse = await fetch(`https://oauth.reddit.com/r/${subreddit}/comments/${post}?raw_json=1&limit=${limit}`, {
@@ -247,8 +314,13 @@ const RedditProvider = (props) => {
                 Authorization: "bearer " + accessToken,
             },
         });
+        const firstComments = await rawResponse.json();
 
-        return await rawResponse.json();
+        // Process comments
+        const processedFirstComments = await processComments(firstComments);
+
+        // Save the comments
+        postComments.current[postID] = processedFirstComments;
     };
 
     // Fetch the info for the subreddits in the list
@@ -307,9 +379,8 @@ const RedditProvider = (props) => {
                 subredditsInfo,
                 vote,
                 getComments,
-
-                // Authors
-                fetchCommentAuthorsInfo,
+                postComments,
+                authorsIcons,
             }}
         >
             {props.children}

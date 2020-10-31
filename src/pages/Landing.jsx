@@ -2,7 +2,6 @@ import React, { useState, useContext } from "react";
 import randomstring from "randomstring";
 import { Redirect } from "react-router-dom";
 import qs from "qs";
-import SVG from "react-inlinesvg";
 
 // Contexts
 import { Reddit } from "contexts/Reddit";
@@ -92,7 +91,7 @@ export default function Landing(props) {
                 <div className="landing">
                     <div className="logo">
                         <span className="appName">redd</span>
-                        <SVG className="icon" src={Logo} />
+                        <img className="icon" src={Logo} alt="" />
                         <span className="appName">n</span>
                     </div>
                     <div className="flexGrow"></div>

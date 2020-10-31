@@ -75,19 +75,18 @@ const Comment = memo(({ children, commentData, style, defaultOpen = true, icons 
     }
 });
 
-export default function Post(props) {
+const Post = memo((props) => {
     // Props
     const { postData, index, currSubreddit } = props;
 
     // Contexts
     const { unixTimeToDate, timeAgo } = useContext(Utils);
-    const { zooms, subredditsInfo, setCurrentSubreddit, currSubredditID, getComments, fetchCommentAuthorsInfo } = useContext(Reddit);
+    const { zooms, subredditsInfo, setCurrentSubreddit, currSubredditID, getComments, postComments, authorsIcons } = useContext(Reddit);
 
     // Zoom access elem
     const zoomSubredditKey = currSubreddit === "all" ? "all" : currSubreddit === "homeSubreddit" ? "homeSubreddit" : "subreddit";
 
     // Post data
-    //console.log(postData);
     const {
         id,
         name,
@@ -186,76 +185,9 @@ export default function Post(props) {
     // #################################################
 
     // Comments for the post
-    const comments = useRef([]);
     const [commentTree, setCommentTree] = useState(null);
 
-    // Icons for all the authors in the comments
-    const authorsIcons = useRef({});
-
-    // Get all replies as array
-    const getReplies = async (replyArray) => {
-        // Format replies
-        var commentElems = await Promise.all(
-            replyArray.map(async ({ kind, data }, i) => {
-                // If it is a reply -> Get its body and recursively get its replies
-                if (kind === "t1") {
-                    // Destructure
-                    const { name, author, author_fullname, body, body_html, likes, locked, replies, score, created_utc } = data;
-
-                    // Get Replies
-                    var repliesTreated = replies ? await getReplies(replies.data.children) : null;
-
-                    // Return relevant information
-                    return {
-                        type: "comment",
-                        name,
-                        author,
-                        author_fullname,
-                        body,
-                        body_html,
-                        likes,
-                        locked,
-                        replies: repliesTreated,
-                        score,
-                        created: timeAgo(unixTimeToDate(created_utc)),
-                    };
-                }
-
-                // If it is a link to more replies -> Get the link info
-                else if (kind === "more") {
-                    // Destructure
-                    const { children, count } = data;
-
-                    // Return relevant information
-                    return { type: "more", children, count };
-                }
-
-                // Incorrect object
-                else return null;
-            })
-        );
-
-        // Get author icons
-        await fetchCommentAuthorsInfo(commentElems, authorsIcons);
-
-        return commentElems;
-    };
-
-    // Process comments
-    const processComments = async (commentsPromise) => {
-        // Wait to have the comments
-        var rawComments = await commentsPromise;
-
-        // Not a comments object
-        if (rawComments.length < 2 || !("data" in rawComments[1]) || !("children" in rawComments[1].data)) return [];
-
-        // Comments array
-        var commentsArray = rawComments[1].data.children;
-
-        // Get the replies for the post
-        return await getReplies(commentsArray);
-    };
-
+    // Get the comments component
     const getCommentsTree = (commentArray) => {
         if (!commentArray) return null;
 
@@ -271,31 +203,19 @@ export default function Post(props) {
         });
     };
 
-    const loadComments = async () => {
-        commentsLoaded.current = true;
-        console.log("Loading Comments");
+    // Load the comments
+    getComments(subreddit, id, name, 100);
 
-        // Get the first comments
-        const firstComments = await getComments(subreddit, id, 20);
-
-        // Process comments
-        const processedFirstComments = await processComments(firstComments);
-
-        // Set first comments
-        comments.current = processedFirstComments;
-        setCommentTree(getCommentsTree(comments.current));
-    };
-
-    // Create comment Tree
-    const commentsLoaded = useRef(false);
-
-    // Get the comments if it is the first post
-    if (!commentsLoaded.current && index === 0) loadComments();
-
-    // Handle a change in the current index
+    // Show the comments
     const indexChangeHandle = ({ subreddit: eventSubreddit, index: eventIndex }) => {
         // If the current post is this one
-        if (eventSubreddit === currSubreddit && index >= eventIndex - 1 && index <= eventIndex + 1 && !commentsLoaded.current) loadComments();
+        if (eventSubreddit === currSubreddit && index === eventIndex && !zooms[zoomSubredditKey]) {
+            console.log(currSubreddit);
+            console.log(index);
+            console.log(zooms[zoomSubredditKey]);
+            console.log("");
+        }
+        //if (eventSubreddit === currSubreddit && index === eventIndex && !zooms[zoomSubredditKey]) setCommentTree(getCommentsTree(postComments.current[name]));
     };
 
     // Listen for events
@@ -331,4 +251,6 @@ export default function Post(props) {
             <div className="comments">{commentTree}</div>
         </div>
     );
-}
+});
+
+export default Post;

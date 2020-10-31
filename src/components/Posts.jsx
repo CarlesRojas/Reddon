@@ -108,14 +108,20 @@ export default function Posts(props) {
         setScrollLeft(-xDispl);
 
         if (zoomedRef.current) {
-            // Set the current index
-            index.current = clamp(Math.round(-xDispl / ROW_WIDTH), 0, posts.current.length - 1);
+            // Get new index
+            const newIndex = clamp(Math.round(-xDispl / ROW_WIDTH), 0, posts.current.length - 1);
 
-            // Load posts if needed
-            if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();
+            // Check for new index
+            if (newIndex !== index.current) {
+                // Set the current index
+                index.current = newIndex;
 
-            // Inform about the index change
-            window.PubSub.emit("onIndexChange", { subreddit, index: index.current });
+                // Load posts if needed
+                if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();
+
+                // Inform about the index change
+                window.PubSub.emit("onIndexChange", { subreddit, index: index.current });
+            }
 
             // Prevent from going out of bounds
             const bounds = [-ROW_WIDTH * (posts.current.length - 1), 0];
@@ -247,11 +253,7 @@ export default function Posts(props) {
             renderedItems.push(
                 <div className="postContainer" key={subreddit + i + posts.current[i].data.id} style={{ width: ROW_WIDTH }}>
                     <animated.div className="animatedPosition" style={{ ...animatedPositionStyle, ...transitionStyle }}>
-                        <animated.div
-                            className="animatedScale"
-                            style={{ ...animatedScaleStyle, ...transitionStyle }}
-                            onClick={() => postClickedHandle(i)}
-                        >
+                        <animated.div className="animatedScale" style={{ ...animatedScaleStyle, ...transitionStyle }} onClick={() => postClickedHandle(i)}>
                             <Post postData={posts.current[i].data} index={i} currSubreddit={subreddit}></Post>
                         </animated.div>
                     </animated.div>
