@@ -40,4 +40,11 @@ export default class EventsPubSub {
         event:          onInertiaStop
         desciption:     Called when the posts stop moving
     },
+
+    {
+        event:          onFirstCommentsLoaded
+        desciption:     Called when the comments for the first post load
+        parameters:     {postID}
+        postID:         The id of the post that had the comments loaded
+    },
 */

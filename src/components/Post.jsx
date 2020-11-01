@@ -220,17 +220,22 @@ const Post = memo((props) => {
         });
     };
 
-    // Load the comments
-    getComments(subreddit, id, name, 50);
-
     // State to hold if this is the current post being seen
-    const isCurrent = useRef(false);
+    const isCurrent = useRef(index === 0);
 
     // Timeout to start rendering the comments
     const showCommentsTimeout = useRef(null);
 
     // State to hold if the comment tree has been set or not
     const commentTreeSet = useRef(false);
+
+    // Load the comments
+    getComments(subreddit, id, name, 50).then(async () => {
+        if (isCurrent.current && !commentTreeSet.current && index === 0) {
+            await setCommentTree(getCommentsTree(postComments.current[name]));
+            commentTreeSet.current = true;
+        }
+    });
 
     // Show the comments
     const indexChangeHandle = ({ subreddit: eventSubreddit, index: eventIndex }) => {
@@ -247,9 +252,8 @@ const Post = memo((props) => {
             // If this is the focused post, load them after half a second
             showCommentsTimeout.current = setTimeout(async () => {
                 await setCommentTree(getCommentsTree(postComments.current[name]));
-
                 commentTreeSet.current = true;
-            }, 500);
+            }, 400);
         }
     };
 

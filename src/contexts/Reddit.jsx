@@ -9,10 +9,6 @@ const RedditProvider = (props) => {
     // Context
     const { setCookie, getCookie, unixTimeToDate, timeAgo } = useContext(Utils);
 
-    // Redirect uri & Client ID
-    const redirectUri = "http://localhost:3000"; // "https://reddon.netlify.app"
-    const clientID = "y7VNHo_M9CHwlA";
-
     // Refresh token timeout
     const refreshTimeout = useRef(null);
 
@@ -47,6 +43,16 @@ const RedditProvider = (props) => {
 
     // State of the comments: closed or opened
     const commentOpen = useRef({});
+
+    // #################################################
+    //   DEBUG
+    // #################################################
+
+    const debug = true;
+
+    // Redirect uri & Client ID
+    const redirectUri = debug ? "http://localhost:3000" : "https://reddon.netlify.app";
+    const clientID = "y7VNHo_M9CHwlA";
 
     // #################################################
     //   AUTHENTICATION
@@ -265,9 +271,13 @@ const RedditProvider = (props) => {
     };
 
     // Get comments for a post
-    const getComments = async (subreddit, post, postID, limit = 50) => {
+    const getComments = async (subreddit, post, postID, limit = 50, first = false) => {
         // Return if already loaded
-        if (postID in postComments.current) return;
+        if (postID in postComments.current) {
+            // Inform that the comments for the first post are loaded
+            return;
+        }
+        // Create the post comments key
         postComments.current[postID] = [];
 
         // Get all replies as array
@@ -328,7 +338,9 @@ const RedditProvider = (props) => {
             var commentsArray = rawComments[1].data.children;
 
             // Get the replies for the post
-            return await getReplies(commentsArray);
+            const repliesArray = await getReplies(commentsArray);
+
+            return repliesArray;
         };
 
         var accessToken = await getAccessToken();
@@ -347,12 +359,17 @@ const RedditProvider = (props) => {
 
         // Save the comments
         postComments.current[postID] = processedFirstComments;
+
+        return;
     };
 
     // Return the context
     return (
         <Reddit.Provider
             value={{
+                // Debug
+                debug,
+
                 // App main info
                 redirectUri,
                 clientID,

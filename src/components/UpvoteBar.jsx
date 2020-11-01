@@ -49,9 +49,7 @@ export default function UpvoteBar(props) {
         <div className="upvoteBar">
             <SVG className="message" src={MessageIcon} />
             <SVG className={"upvote" + (upvoted ? " active" : "")} src={UpvoteIcon} onClick={upvote} />
-            <span className={"score" + (upvoted ? " up" : downvoted ? " down" : "")}>
-                {format_number(score + (upvoted ? 1 : downvoted ? -1 : 0))}
-            </span>
+            <span className={"score" + (upvoted ? " up" : downvoted ? " down" : "")}>{format_number(score + (upvoted ? 1 : downvoted ? -1 : 0))}</span>
             <SVG className={"downvote up" + (downvoted ? " active" : "")} src={UpvoteIcon} onClick={downvote} />
         </div>
     );
