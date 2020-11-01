@@ -1,13 +1,15 @@
 import React, { useContext, useRef, useState, useEffect, memo } from "react";
 import { useSpring, animated } from "react-spring";
 import ReactHtmlParser from "react-html-parser";
+import SVG from "react-inlinesvg";
 
 // Contexts
 import { Utils } from "contexts/Utils";
 import { Reddit } from "contexts/Reddit";
 
-// Icon
+// Icons
 import ReddonLogo from "resources/ReddonLogo.svg";
+import RefreshIcon from "resources/Refresh.svg";
 
 import UpvoteBar from "components/UpvoteBar";
 import Text from "components/postTypes/Text";
@@ -290,6 +292,15 @@ const Post = memo((props) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Loading comments
+    const loadingComment = !commentTree ? (
+        <div className="loadingComment">
+            <div className={"iconContainer" + (zooms[zoomSubredditKey] ? " invisible" : "")}>
+                <SVG className={"icon" + (zooms[zoomSubredditKey] ? "" : " spin")} src={RefreshIcon} />
+            </div>
+        </div>
+    ) : null;
+
     // #################################################
     //   RENDER
     // #################################################
@@ -309,7 +320,10 @@ const Post = memo((props) => {
                 <div className={"correctMargin" + correctMargin}></div>
                 <UpvoteBar ID={name} score={score} likes={likes} numComments={num_comments} isComment={false}></UpvoteBar>
             </div>
-            <div className="comments">{commentTree}</div>
+            <div className="comments">
+                {loadingComment}
+                {commentTree}
+            </div>
         </div>
     );
 });

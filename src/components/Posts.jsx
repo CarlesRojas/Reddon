@@ -283,7 +283,7 @@ export default function Posts(props) {
     };
 
     // Loading
-    var loading = !renderedItems.length ? (
+    const loading = !renderedItems.length ? (
         <div className="loading">
             <SVG className="icon spin" src={RefreshIcon} />
         </div>
