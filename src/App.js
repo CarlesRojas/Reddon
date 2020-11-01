@@ -1,13 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 
 import Home from "pages/Home";
 import Landing from "pages/Landing";
 
+// Contexts
+import { Utils } from "contexts/Utils";
+
 export default function App() {
-    // Set dark mode
-    document.body.classList.add("dark");
-    //document.body.classList.remove("dark");
+    // Contexts
+    const { getCookie } = useContext(Utils);
+
+    // Dark mode
+    if (getCookie("reddon_dark_mode") !== "0") document.body.classList.add("dark");
 
     return (
         <Router>
