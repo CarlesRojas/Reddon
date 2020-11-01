@@ -234,7 +234,6 @@ const Post = memo((props) => {
 
     // Show the comments
     const indexChangeHandle = ({ subreddit: eventSubreddit, index: eventIndex }) => {
-        if (currSubreddit === "all" && index === 1) console.log(eventSubreddit + " " + eventIndex + " " + currZoom.current);
         // If the current post is this one
         isCurrent.current = eventSubreddit === currSubreddit && index === eventIndex && !currZoom.current;
 
@@ -256,7 +255,6 @@ const Post = memo((props) => {
 
     // Listen for events
     useEffect(() => {
-        if (currSubreddit === "all" && index === 1) console.log("SUB");
         window.PubSub.sub("onIndexChange", indexChangeHandle);
         window.PubSub.sub("onInertiaStop", inertiaStopHandle);
 

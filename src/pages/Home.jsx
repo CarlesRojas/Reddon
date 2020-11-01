@@ -19,34 +19,8 @@ export default function Home() {
     const { useForceUpdate, invlerp } = useContext(Utils);
     const { currentSubreddit, setCurrentSubreddit, getPosts, allPosts, homePosts, subredditPosts, setZooms, zooms } = useContext(Reddit);
 
-    // #################################################
-    //   ROUTER HISTORY AND BACK BUTTON
-    // #################################################
-
     // Router history
     const prevSubreddit = useRef(currentSubreddit);
-
-    // Intercept back button
-    useEffect(() => {
-        window.onpopstate = function (event) {
-            if (event.state && event.type === "popstate") {
-                // Clear the posts
-                subredditPosts.current = [];
-
-                // Remove zoom
-                console.log("Zoom 5");
-                setZooms({ ...zooms, subreddit: false });
-
-                // Set the previous subreddit as the current one
-                setCurrentSubreddit(prevSubreddit.current);
-            }
-        };
-        return () => {
-            window.onpopstate = null;
-        };
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     // #################################################
     //   NAVIGATION SPRINGS
@@ -59,7 +33,6 @@ export default function Home() {
             subredditPosts.current = [];
 
             // Remove zoom
-            console.log("Zoom 6");
             setZooms({ ...zooms, subreddit: false });
 
             // Set the previous subreddit as the current one
@@ -158,10 +131,26 @@ export default function Home() {
         // Load first posts
         loadFirstPosts();
 
+        // Register Back button
+        window.onpopstate = function (event) {
+            if (event.state && event.type === "popstate") {
+                // Clear the posts
+                subredditPosts.current = [];
+
+                // Remove zoom
+                setZooms({ ...zooms, subreddit: false });
+
+                // Set the previous subreddit as the current one
+                setCurrentSubreddit(prevSubreddit.current);
+            }
+        };
+
+        return () => {
+            window.onpopstate = null;
+        };
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    console.log("RENDER HOME");
 
     return (
         <div className="app">
@@ -182,7 +171,11 @@ export default function Home() {
             ></animated.div>
             <animated.div className="subredditPopupContainer" style={{ y, width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}>
                 <div className="subredditPopup">
-                    <Posts subreddit={currentSubreddit} posts={subredditPosts} firstPostsLoaded={firstPostsLoaded}></Posts>
+                    <Posts
+                        subreddit={currentSubreddit !== "all" && currentSubreddit !== "homeSubreddit" ? currentSubreddit : ""}
+                        posts={subredditPosts}
+                        firstPostsLoaded={firstPostsLoaded}
+                    ></Posts>
                 </div>
                 <div {...gestureBind()}>
                     <SubredditBar prevSubreddit={prevSubreddit}></SubredditBar>

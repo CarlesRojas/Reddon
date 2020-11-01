@@ -56,8 +56,6 @@ export default function Posts(props) {
 
     // Handles a change in the zoom
     useEffect(() => {
-        console.log("ZOOM UPDATE " + subreddit);
-
         // Snap to current post
         if (currentSubreddit === subreddit && !zooms[zoomSubredditKey]) {
             setX({ x: index.current * -ROW_WIDTH, config: { decay: false, velocity: 0 } });
@@ -82,14 +80,12 @@ export default function Posts(props) {
         if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();
 
         // Inform about the index change
-        console.log("2");
         window.PubSub.emit("onIndexChange", { subreddit, index: index.current, loadComments: true });
 
         // Swap zoom scale and mode
         zoomedRef.current = false;
 
         // Swap zoom scale and mode
-        console.log("Zoom 2");
         if (subreddit === "all") setZooms({ ...zooms, all: false });
         else if (subreddit === "homeSubreddit") setZooms({ ...zooms, homeSubreddit: false });
         else setZooms({ ...zooms, subreddit: false });
@@ -124,7 +120,6 @@ export default function Posts(props) {
                 if (index.current > posts.current.length - LOAD_MORE_BUFFER) loadMorePosts();
 
                 // Inform about the index change
-                console.log("3");
                 window.PubSub.emit("onIndexChange", { subreddit, index: index.current });
             }
 
@@ -169,7 +164,6 @@ export default function Posts(props) {
                     cancel((index.current = newIndex));
 
                     // Inform about the index change
-                    console.log("4");
                     window.PubSub.emit("onIndexChange", { subreddit, index: index.current });
 
                     // Load posts if needed
