@@ -48,7 +48,7 @@ const RedditProvider = (props) => {
     //   DEBUG
     // #################################################
 
-    const debug = true;
+    const debug = false;
 
     // Redirect uri & Client ID
     const redirectUri = debug ? "http://localhost:3000" : "https://reddon.netlify.app";
