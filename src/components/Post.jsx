@@ -25,7 +25,7 @@ const Comment = memo(({ children, commentData, style, defaultOpen = true, icons 
     // If it is a comment
     if (commentData.type === "comment") {
         // Deconstruct comment
-        const { author, author_fullname, created, body_html, name } = commentData;
+        const { author, author_fullname, created, body, body_html, name } = commentData;
 
         // State to hold if it is open or not
         if (!(name in commentOpen.current)) commentOpen.current[name] = defaultOpen;
@@ -49,25 +49,43 @@ const Comment = memo(({ children, commentData, style, defaultOpen = true, icons 
             var authorIcon = <img className="authorIcon" src={icons.current[author_fullname].icon_img} alt=""></img>;
         } else authorIcon = <img className="authorIcon" src={ReddonLogo} alt=""></img>;
 
-        // Comment body
-        const commentBody = body_html ? <div className="commentText">{ReactHtmlParser(body_html)}</div> : null;
-
         // Handle click on the comment
         const clickHandle = () => {
             commentOpen.current[name] = !isOpen;
             setOpen(!isOpen);
         };
 
-        return (
-            <div className="comment">
+        // Comment body
+        if (isOpen)
+            var commentContent = (
+                <div className="content open" style={style} onClick={clickHandle}>
+                    <div className="authorInfo">
+                        {authorIcon}
+                        <div className="authorName">{author}</div>
+                        <div className="created">• {created}</div>
+                    </div>
+                    {body_html ? <div className="commentOpen">{ReactHtmlParser(body_html)}</div> : null}
+                </div>
+            );
+        else
+            commentContent = (
                 <div className="content" style={style} onClick={clickHandle}>
                     <div className="authorInfo">
                         {authorIcon}
-                        <span className="authorName">{author}</span>
-                        <span className="created">• {created}</span>
+                        <div className="authorName">{author}</div>
+                        <div className="created">• {created}</div>
                     </div>
-                    {commentBody}
+                    {body ? (
+                        <div className="commentClosed">
+                            <p>{body}</p>
+                        </div>
+                    ) : null}
                 </div>
+            );
+
+        return (
+            <div className="comment">
+                {commentContent}
                 <animated.div className="replies" style={{ opacity, height: isOpen && previous === isOpen ? "auto" : height }}>
                     <animated.div style={{ transform }} {...bind} children={children} />
                 </animated.div>

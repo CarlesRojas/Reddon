@@ -786,12 +786,17 @@ button {
         .content {
             vertical-align: middle;
             width: 100%;
-            display: flex;
-            flex-direction: column;
+            display: inline-flex;
+            flex-direction: row;
+
+            &.open {
+                display: flex;
+                flex-direction: column;
+            }
 
             .authorInfo {
                 height: $comment-author-height;
-                width: 100%;
+                width: fit-content;
                 display: flex;
                 align-content: center;
 
@@ -806,28 +811,42 @@ button {
 
                 .authorName {
                     box-sizing: border-box;
-                    display: flex;
-                    flex-direction: column;
-                    height: 100%;
+                    height: $comment-author-height;
+                    line-height: $comment-author-height;
+                    font-size: 0.75em;
                     padding-left: 2px;
-                    justify-content: center;
-                    font-size: 0.85em;
                     font-weight: bold;
                 }
 
                 .created {
                     box-sizing: border-box;
-                    display: flex;
-                    flex-direction: column;
-                    height: 100%;
+                    height: $comment-author-height;
+                    line-height: $comment-author-height;
+                    font-size: 0.75em;
                     padding-left: 4px;
-                    justify-content: center;
-                    font-size: 0.7em;
                     opacity: 0.3;
                 }
             }
 
-            .commentText {
+            .commentClosed {
+                box-sizing: border-box;
+                height: $comment-author-height;
+                flex: 1;
+                padding: 0 5px;
+                opacity: 0.3;
+                min-width: 0;
+
+                p {
+                    font-size: 0.75em;
+                    height: $comment-author-height;
+                    line-height: $comment-author-height;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+
+            .commentOpen {
                 box-sizing: border-box;
                 padding: 0 5px 5px;
                 font-size: 0.95em;
