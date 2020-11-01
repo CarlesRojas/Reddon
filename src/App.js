@@ -6,7 +6,7 @@ import Landing from "pages/Landing";
 
 export default function App() {
     // Set dark mode
-    document.body.classList.add("dark");
+    //document.body.classList.add("dark");
     //document.body.classList.remove("dark");
 
     return (

@@ -25,7 +25,7 @@ const Comment = memo(({ children, commentData, style, defaultOpen = true, icons 
     // If it is a comment
     if (commentData.type === "comment") {
         // Deconstruct comment
-        const { author, author_fullname, created, body, body_html, name } = commentData;
+        const { author, author_fullname, created, body, body_html, name, score, likes } = commentData;
 
         // State to hold if it is open or not
         if (!(name in commentOpen.current)) commentOpen.current[name] = defaultOpen;
@@ -62,9 +62,10 @@ const Comment = memo(({ children, commentData, style, defaultOpen = true, icons 
                     <div className="authorInfo">
                         {authorIcon}
                         <div className="authorName">{author}</div>
-                        <div className="created">• {created}</div>
+                        <div className="created">· {created}</div>
                     </div>
                     {body_html ? <div className="commentOpen">{ReactHtmlParser(body_html)}</div> : null}
+                    <UpvoteBar ID={name} score={score} likes={likes} numComments={0} isComment={true}></UpvoteBar>
                 </div>
             );
         else
@@ -73,7 +74,7 @@ const Comment = memo(({ children, commentData, style, defaultOpen = true, icons 
                     <div className="authorInfo">
                         {authorIcon}
                         <div className="authorName">{author}</div>
-                        <div className="created">• {created}</div>
+                        <div className="created">· {created} ·</div>
                     </div>
                     {body ? (
                         <div className="commentClosed">
@@ -138,6 +139,7 @@ const Post = memo((props) => {
         domain,
         score,
         likes,
+        num_comments,
         post_hint,
         /*
         over_18,
@@ -300,12 +302,12 @@ const Post = memo((props) => {
                     <p className="subreddit">{subreddit}</p>
                 </div>
 
-                <p className="author">{author + " • " + timeAgo(unixTimeToDate(created_utc), false)}</p>
+                <p className="author">{author + " · " + timeAgo(unixTimeToDate(created_utc), false)}</p>
                 <p className="title">{title}</p>
                 {finalMedia}
                 {text}
                 <div className={"correctMargin" + correctMargin}></div>
-                <UpvoteBar postID={name} score={score} likes={likes}></UpvoteBar>
+                <UpvoteBar ID={name} score={score} likes={likes} numComments={num_comments} isComment={false}></UpvoteBar>
             </div>
             <div className="comments">{commentTree}</div>
         </div>

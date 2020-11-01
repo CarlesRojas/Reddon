@@ -6,14 +6,14 @@ $background: rgb(220, 220, 220);
 $foreground: rgb(245, 245, 245);
 $text: rgb(58, 58, 58);
 $icon: rgb(100, 100, 100);
-$icon-dimm: rgb(160, 160, 160);
+$icon-dimm: rgb(180, 180, 180);
 $link: rgba(0, 106, 177, 0.75);
 
 $background-dark: rgb(20, 20, 20);
 $foreground-dark: rgb(39, 39, 39);
 $text-dark: rgb(230, 230, 230);
 $icon-dark: rgb(163, 163, 163);
-$icon-dimm-dark: rgb(85, 85, 85);
+$icon-dimm-dark: rgb(75, 75, 75);
 $link-dark: rgba(0, 153, 255, 0.75);
 
 $font-size: 18px;
@@ -22,7 +22,7 @@ $animation-speed: 0.2s;
 $navbar-height: 40px;
 $main-margin: 3px; // Also change in Images.jsx and EmbededVide.jsx
 $border-radius: 10px;
-$upvote-bar-height: 25px;
+$upvote-bar-height: 20px;
 $link-bar-height: 35px;
 $comment-author-height: 26px;
 
@@ -959,13 +959,17 @@ button {
     justify-content: flex-end;
     margin-top: 5px;
 
+    &.commentBar {
+        margin-top: 0;
+    }
+
     .message {
         box-sizing: border-box;
         width: $upvote-bar-height;
         min-width: $upvote-bar-height;
         max-width: $upvote-bar-height;
-        padding: 5px;
-        margin-right: 25px;
+        padding: 4px;
+        margin: 0 5px;
 
         .cls-1 {
             stroke: $icon-dimm !important;
@@ -976,13 +980,30 @@ button {
         }
     }
 
+    .messageNum {
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: $icon-dimm;
+        margin-right: 30px;
+        height: $upvote-bar-height;
+        line-height: $upvote-bar-height;
+
+        .dark & {
+            color: $icon-dimm-dark;
+        }
+
+        &.invisible {
+            display: none;
+        }
+    }
+
     .upvote,
     .downvote {
         box-sizing: border-box;
         width: $upvote-bar-height;
         min-width: $upvote-bar-height;
         max-width: $upvote-bar-height;
-        padding: 6px;
+        padding: 5px;
         margin: 0 5px;
 
         .cls-1 {
@@ -1013,9 +1034,11 @@ button {
     }
 
     .score {
-        font-size: 0.8rem;
+        font-size: 0.7rem;
         font-weight: 600;
         color: $icon-dimm;
+        height: $upvote-bar-height;
+        line-height: $upvote-bar-height;
 
         .dark & {
             color: $icon-dimm-dark;

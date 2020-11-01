@@ -11,7 +11,7 @@ import MessageIcon from "resources/Message.svg";
 
 export default function UpvoteBar(props) {
     // Props
-    const { postID, score, likes } = props;
+    const { ID, score, likes, numComments, isComment } = props;
 
     // Contexts
     const { format_number } = useContext(Utils);
@@ -26,9 +26,12 @@ export default function UpvoteBar(props) {
     const [downvoted, setDownvoted] = useState(typeof likes === "boolean" && !likes);
 
     // Upvote
-    const upvote = () => {
+    const upvote = (event) => {
+        // Stop Propagation
+        event.stopPropagation();
+
         // Vote over api
-        vote(postID, upvoted ? "0" : "1");
+        vote(ID, upvoted ? "0" : "1");
 
         // Update icons
         setUpvoted(!upvoted);
@@ -36,9 +39,12 @@ export default function UpvoteBar(props) {
     };
 
     // Downvote
-    const downvote = () => {
+    const downvote = (event) => {
+        // Stop Propagation
+        event.stopPropagation();
+
         // Vote over api
-        vote(postID, downvoted ? "0" : "-1");
+        vote(ID, downvoted ? "0" : "-1");
 
         // Update icons
         setDownvoted(!downvoted);
@@ -46,8 +52,9 @@ export default function UpvoteBar(props) {
     };
 
     return (
-        <div className="upvoteBar">
+        <div className={"upvoteBar" + (isComment ? " commentBar" : "")}>
             <SVG className="message" src={MessageIcon} />
+            <span className={"messageNum" + (isComment ? " invisible" : "")}>{format_number(numComments)}</span>
             <SVG className={"upvote" + (upvoted ? " active" : "")} src={UpvoteIcon} onClick={upvote} />
             <span className={"score" + (upvoted ? " up" : downvoted ? " down" : "")}>{format_number(score + (upvoted ? 1 : downvoted ? -1 : 0))}</span>
             <SVG className={"downvote up" + (downvoted ? " active" : "")} src={UpvoteIcon} onClick={downvote} />
