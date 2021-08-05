@@ -1,5 +1,6 @@
 import React, { useContext, useRef, useEffect } from "react";
 import { useSpring, animated } from "react-spring";
+import { Redirect } from "react-router-dom";
 import { useDrag } from "react-use-gesture";
 
 import Navbar from "components/Navbar";
@@ -17,10 +18,16 @@ const SCREEN_HEIGHT = window.innerHeight;
 export default function Home() {
     // Contexts
     const { useForceUpdate, invlerp } = useContext(Utils);
-    const { currentSubreddit, setCurrentSubreddit, getPosts, allPosts, homePosts, subredditPosts, setZooms, zooms } = useContext(Reddit);
+    const { accessGranted, currentSubreddit, setCurrentSubreddit, getPosts, allPosts, homePosts, subredditPosts, setZooms, zooms } = useContext(Reddit);
 
     // Router history
     const prevSubreddit = useRef(currentSubreddit);
+
+    // Access is not Granted -> Go to Landing Page
+    if (!accessGranted) {
+        // Reddirect to Landing Page
+        var backToLanding = <Redirect to="/" />;
+    }
 
     // #################################################
     //   NAVIGATION SPRINGS
@@ -95,62 +102,64 @@ export default function Home() {
     const forceUpdate = useForceUpdate();
 
     // Load new posts for the custom subreddit
-    useEffect(() => {
-        // Load fewer posts to show them faster to the user
-        async function loadFirstPosts() {
-            // Get first posts for "all" and "homeSubreddit"
-            await getPosts(currentSubreddit, 8, true);
+    // useEffect(() => {
+    //     // Load fewer posts to show them faster to the user
+    //     async function loadFirstPosts() {
+    //         // Get first posts for "all" and "homeSubreddit"
+    //         await getPosts(currentSubreddit, 8, true);
 
-            // Force update
-            forceUpdate();
-        }
+    //         // Force update
+    //         forceUpdate();
+    //     }
 
-        // Load first posts
-        if (!subredditPosts.length && currentSubreddit !== "all" && currentSubreddit !== "homeSubreddit") loadFirstPosts();
+    //     // Load first posts
+    //     if (!subredditPosts.length && currentSubreddit !== "all" && currentSubreddit !== "homeSubreddit") loadFirstPosts();
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentSubreddit]);
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [currentSubreddit]);
 
     // Component did mount
-    useEffect(() => {
-        // Load fewer posts to show them faster to the user
-        async function loadFirstPosts() {
-            // Get first posts for "all" and "homeSubreddit"
-            await Promise.all([getPosts("all", 8, true), getPosts("homeSubreddit", 8)]);
+    // useEffect(() => {
+    //     // Load fewer posts to show them faster to the user
+    //     async function loadFirstPosts() {
+    //         // Get first posts for "all" and "homeSubreddit"
+    //         await Promise.all([getPosts("all", 8, true), getPosts("homeSubreddit", 8)]);
 
-            // Force update
-            forceUpdate();
+    //         // Force update
+    //         forceUpdate();
 
-            // Get more posts for "all" and "homeSubreddit"
-            await Promise.all([getPosts("all", 50), getPosts("homeSubreddit", 50)]);
+    //         // Get more posts for "all" and "homeSubreddit"
+    //         await Promise.all([getPosts("all", 50), getPosts("homeSubreddit", 50)]);
 
-            // Inform that the first posts have been loaded
-            firstPostsLoaded.current = true;
-        }
+    //         // Inform that the first posts have been loaded
+    //         firstPostsLoaded.current = true;
+    //     }
 
-        // Load first posts
-        loadFirstPosts();
+    //     // Load first posts
+    //     //loadFirstPosts();
 
-        // Register Back button
-        window.onpopstate = function (event) {
-            if (event.state && event.type === "popstate") {
-                // Clear the posts
-                subredditPosts.current = [];
+    //     // Register Back button
+    //     window.onpopstate = function (event) {
+    //         if (event.state && event.type === "popstate") {
+    //             // Clear the posts
+    //             subredditPosts.current = [];
 
-                // Remove zoom
-                setZooms({ ...zooms, subreddit: false });
+    //             // Remove zoom
+    //             setZooms({ ...zooms, subreddit: false });
 
-                // Set the previous subreddit as the current one
-                setCurrentSubreddit(prevSubreddit.current);
-            }
-        };
+    //             // Set the previous subreddit as the current one
+    //             setCurrentSubreddit(prevSubreddit.current);
+    //         }
+    //     };
 
-        return () => {
-            window.onpopstate = null;
-        };
+    //     return () => {
+    //         window.onpopstate = null;
+    //     };
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, []);
+
+    if (backToLanding) return backToLanding;
 
     return (
         <div className="app">
@@ -171,11 +180,7 @@ export default function Home() {
             ></animated.div>
             <animated.div className="subredditPopupContainer" style={{ y, width: SCREEN_WIDTH, height: SCREEN_HEIGHT }}>
                 <div className="subredditPopup">
-                    <Posts
-                        subreddit={currentSubreddit !== "all" && currentSubreddit !== "homeSubreddit" ? currentSubreddit : ""}
-                        posts={subredditPosts}
-                        firstPostsLoaded={firstPostsLoaded}
-                    ></Posts>
+                    <Posts subreddit={currentSubreddit !== "all" && currentSubreddit !== "homeSubreddit" ? currentSubreddit : ""} posts={subredditPosts} firstPostsLoaded={firstPostsLoaded}></Posts>
                 </div>
                 <div {...gestureBind()}>
                     <SubredditBar prevSubreddit={prevSubreddit}></SubredditBar>

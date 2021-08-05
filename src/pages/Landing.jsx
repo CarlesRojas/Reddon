@@ -12,18 +12,17 @@ import Logo from "resources/ReddonLogo.svg";
 
 export default function Landing(props) {
     // Contexts
-    const { redirectUri, clientID, requestAccessToken, refreshAccessToken } = useContext(Reddit);
+    const { accessGranted, redirectUri, clientID, requestAccessToken, refreshAccessToken } = useContext(Reddit);
     const { setCookie, getCookies, clearCookies } = useContext(Utils);
 
     // State
-    const [accessGranted, setAccessGranted] = useState(false);
     const [cookies] = useState(getCookies());
 
     // Get the url parameters
     const urlParams = qs.parse(props.location.search, { ignoreQueryPrefix: true });
 
     // Access is Granted -> Go to Home
-    if (accessGranted) {
+    if (accessGranted.current) {
         // Reddirect to Home
         var render = <Redirect to="/home" />;
     }
@@ -44,9 +43,9 @@ export default function Landing(props) {
         console.log("Refresh Token Present -> Get Access Token");
 
         // Get the access and refresh tokens for the first time
-        setAccessGranted(refreshAccessToken());
+        accessGranted.current = refreshAccessToken();
 
-        render = null;
+        render = accessGranted.current ? <Redirect to="/home" /> : null;
     }
 
     // No Refresh Token -> Log in Process
@@ -58,9 +57,9 @@ export default function Landing(props) {
                 console.log("Login Done -> Fetch Access and Refresh Tokens");
 
                 // Get the access and refresh tokens for the first time
-                setAccessGranted(requestAccessToken(urlParams.code));
+                accessGranted.current = requestAccessToken(urlParams.code);
 
-                render = null;
+                render = accessGranted.current ? <Redirect to="/home" /> : null;
             }
 
             // Incorrect State Random String -> Delete cookies and start again

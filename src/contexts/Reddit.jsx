@@ -9,6 +9,9 @@ const RedditProvider = (props) => {
     // Context
     const { setCookie, getCookie, unixTimeToDate, timeAgo } = useContext(Utils);
 
+    // Landing Check
+    const accessGranted = useRef(false);
+
     // Refresh token timeout
     const refreshTimeout = useRef(null);
 
@@ -48,7 +51,7 @@ const RedditProvider = (props) => {
     //   DEBUG
     // #################################################
 
-    const debug = false;
+    const debug = true;
 
     // Redirect uri & Client ID
     const redirectUri = debug ? "http://localhost:3000" : "https://reddon.netlify.app";
@@ -367,6 +370,9 @@ const RedditProvider = (props) => {
     return (
         <Reddit.Provider
             value={{
+                // Landing Check
+                accessGranted,
+
                 // Debug
                 debug,
 
